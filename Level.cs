@@ -98,7 +98,7 @@ namespace DreamCatcher
 
         List<Obstacle> obstacles = new List<Obstacle>();
 
-        bool levelSucced = false;
+        //bool levelSucced = false;
         Button endLevel;
         Button goToTheCity;
         #endregion

@@ -16,8 +16,6 @@ namespace DreamCatcher
     static class MainClass
     {
         #region Variabes
-        static Lua lua = new Lua();
-
         public static Point currentFrameSize = new Point(640, 480);
 
         //"Центр" отрисовываемого фона
@@ -150,11 +148,6 @@ namespace DreamCatcher
                 log.WriteLineAsync(s);
                 log.Close();
             }
-        }
-
-        public static void ParseObject(string prefabPath, ref string id)
-        {
-            object[] info = lua.DoFile(prefabPath);
         }
         #endregion
     }

@@ -146,6 +146,8 @@
     <Content Include="Content\Files\Objects\object.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Content\Files\Enemies\b_shadow_hunter.lua" />
+    <None Include="Content\Files\Enemies\enemy.lua" />
     <None Include="Content\Fonts\Arial.spritefont" />
     <None Include="Content\Fonts\ComicSans.spritefont" />
     <None Include="Content\Fonts\Curlz.spritefont" />

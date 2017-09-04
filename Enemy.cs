@@ -13,13 +13,18 @@ namespace DreamCatcher
     {
         #region Variables
         EnemyClass eClass;
+        EnemiesID ID;
+
         State state = State.Stay;
         Dir dir = Dir.Left;
+
         int health;
         int attack;
         int defence;
+
         bool isAttacking = false;
         //bool gravityOn = false;
+
         bool isGrounded = true;
         bool jump = false;
         bool downWeGo = false;
@@ -183,8 +188,8 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             this.jumpDelay = (int)(jumpRadius / speed.Y);
         }
 
-        public Enemy(EnemiesID ID, EnemyClass @class, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed, int millisecondsPerFrame, int jumpRadius, int attackRadius, Rectangle collisionRectangle, int visionRadius = 200) :
-            base(null, position, frameSize, collisionOffset, currentFrame, sheetSize, speed, millisecondsPerFrame)
+        public Enemy(EnemyClass @class, Texture2D spriteSheet, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed, int millisecondsPerFrame, int jumpRadius, int attackRadius, Rectangle collisionRectangle, int visionRadius = 200, int health = 1, int attack = 0, int defence = 0) :
+base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize, speed, millisecondsPerFrame)
         {
             eClass = @class;
             this.jumpRadius = jumpRadius;
@@ -192,18 +197,53 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             this.visionRadius = visionRadius;
             this.collisionRectangle = collisionRectangle;
             this.jumpDelay = (int)(jumpRadius / speed.Y);
+            this.health = health;
+            this.attack = attack;
+            this.defence = defence;
+        }
 
-            switch (ID)
+        public Enemy(EnemiesID ID, EnemyClass @class, Vector2 position)
+            :base(null, Vector2.Zero, Point.Zero, 0, Point.Zero, Point.Zero, Vector2.Zero)
+        {
+            this.ID = ID;
+            eClass = @class;
+            //Получаем таблицу. Обращаемся по ключам. Еееей)
+            object[] result = new object[0];
+            switch (eClass)
             {
-                case EnemiesID.Shadow_Hunter:
-                case EnemiesID.Shadow_Bull:
-                case EnemiesID.Shadow_Spider:
-                case EnemiesID.Shadow_Flier:
-                case EnemiesID.Shadow_Croc:
-                case EnemiesID.Shadow_Oak_Boss:
-                    textureImage = MainClass.Load<Texture2D>("");
+                case EnemyClass.Basic:
+                    result = FileManager.ParseLuaFile($"Content\\Files\\Enemies\\b_{ID.ToString().ToLower()}.lua");
                     break;
             }
+            NLua.LuaTable table = (NLua.LuaTable)result[0];
+            textureImage = MainClass.Load<Texture2D>(table["texture"].ToString());
+            this.position = position;
+
+            NLua.LuaTable tabl = (NLua.LuaTable)table["frame_size"];
+            frameSize = new Point(Convert.ToInt32(tabl["x"]), Convert.ToInt32(tabl["y"]));
+
+            tabl = (NLua.LuaTable)table["current_frame"];
+            currentFrame = new Point(Convert.ToInt32(tabl["x"]), Convert.ToInt32(tabl["y"]));
+
+            tabl = (NLua.LuaTable)table["sheet_size"];
+            sheetSize = new Point(Convert.ToInt32(tabl["x"]), Convert.ToInt32(tabl["y"]));
+
+            collisionOffset = Convert.ToInt32(table["collision_offset"]);
+
+            tabl = (NLua.LuaTable)table["speed"];
+            speed = new Vector2(Convert.ToSingle(tabl["x"]), Convert.ToSingle(tabl["y"]));
+            millisecondsPerFrame = Convert.ToInt32(table["milliseconds_per_frame"]);
+            visionRadius = Convert.ToInt32(table["vision_rad"]);
+            attackRadius = Convert.ToInt32(table["attack_rad"]);
+            jumpRadius = Convert.ToInt32(table["jump_rad"]);
+
+            tabl = (NLua.LuaTable)table["collision_rectangle"];
+            collisionRectangle = new Rectangle(Convert.ToInt32(tabl["x"]), Convert.ToInt32(tabl["y"]), Convert.ToInt32(tabl["width"]), Convert.ToInt32(tabl["height"]));
+
+            health = Convert.ToInt32(table["hit_points"]);
+            attack = Convert.ToInt32(table["attack_points"]);
+            defence = Convert.ToInt32(table["defence_points"]);
+            jumpDelay = (int)(jumpRadius / speed.Y);
         }
         #endregion
 

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 
+using NLua;
+
 namespace DreamCatcher
 {
     public static class FileManager
@@ -17,6 +19,8 @@ namespace DreamCatcher
 
         static StreamReader settingsRead;
         static StreamReader mainRead;
+
+        static Lua lua = new Lua();
         #endregion
 
         #region Methods
@@ -393,6 +397,47 @@ namespace DreamCatcher
                         break;
                 }
             }
+        }
+
+        public static object[] ParseLuaFile(string luaFilePath)
+        {
+            return lua.DoFile(luaFilePath);
+        }
+
+        public static bool RegisterLuaVariable(string path, object o)
+        {
+            try
+            {
+                lua[path] = o;
+                return true;
+            }
+            catch (NLua.Exceptions.LuaException e)
+            {
+                return false;
+            }
+        }
+
+        public static object GetLuaVariable(string path)
+        {
+            return lua[path];
+        }
+
+        public static bool RegisterLuaFunction(string path, object target, System.Reflection.MethodBase method)
+        {
+            try
+            {
+                lua.RegisterFunction(path, target, method);
+                return true;
+            }
+            catch (NLua.Exceptions.LuaException)
+            {
+                return false;
+            }
+        }
+
+        public static LuaFunction GetLuaFunction(string path)
+        {
+            return lua.GetFunction(path);
         }
 
         //Вызываем уже в самом конце, что бы закрыть потоки

@@ -80,8 +80,9 @@ namespace DreamCatcher
             background = Game.Content.Load<Texture2D>(@"Images\Backgrounds\Background" + Level);
             ground = Game.Content.Load<Texture2D>((@"Images\Backgrounds\Ground" + Level).ToString());
             Texture2D lantern = Game.Content.Load<Texture2D>(@"Images\Objects\Lanterns\LanternAnimation");
-            enemyList.Add(new Enemy(EnemyClass.Basic, MainClass.Load<Texture2D>(@"Images\Enemies\EnemyAnimation1V2"), new Vector2(1800, 869 - 128),
-                new Point(101, 130), 0, new Point(0, 0), new Point(8, 4), new Vector2(1.7f, 1.5f), 80, 140, 50, new Rectangle(20, 0, 60, 130)));
+            //enemyList.Add(new Enemy(EnemyClass.Basic, MainClass.Load<Texture2D>(@"Images\Enemies\EnemyAnimation1V2"), new Vector2(1800, 869 - 128),
+            //    new Point(101, 130), 0, new Point(0, 0), new Point(8, 4), new Vector2(1.7f, 1.5f), 80, 140, 50, new Rectangle(20, 0, 60, 130)));
+            enemyList.Add(new Enemy(EnemiesID.Shadow_Hunter, EnemyClass.Basic, new Vector2(1800, 869 - 128)));
             level = new Level(game, spriteBatch, player, enemyList, lantern,
                 new GameScreen(ScreenType.Movable, new Texture2D[] { background }, background.Bounds.Size, Point.Zero, new Point(1, 1), 0, 0),
                 ground, objects, region, 0);
