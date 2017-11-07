@@ -17,18 +17,3 @@ local enemy = Enemy:new("b_shadow_hunter",
 					{20,0,60,130}
 					)
 return enemy
---Enemy:GetID(enemy)
---Enemy:GetTexture(enemy)
---Enemy:GetFrameSize(enemy)
---Enemy:GetCurrentFrame(enemy)
---Enemy:GetSheetSize(enemy)
---Enemy:GetCollisionOffset(enemy)
---Enemy:GetSpeed(enemy)
---Enemy:GetMillisecondsPerFrame(enemy)
---Enemy:GetVisionRadius(enemy)
---Enemy:GetAttackRadius(enemy)
---Enemy:GetJumpRadius(enemy)
---Enemy:GetCollisionRectangle(enemy)
---Enemy:GetHealth(enemy)
---Enemy:GetDefence(enemy)
---Enemy:GetAttack(enemy)

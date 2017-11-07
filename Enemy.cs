@@ -3,15 +3,62 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DreamCatcher
 {
+    public static class EnemyFactory
+    {
+        static Nullable<Point> spawnPoint = null;
+
+#region Methods
+        public static Enemy GetBasicEnemy(EnemiesID ID, Vector2 position)
+        {
+            return new Enemy(ID, EnemyClass.Basic, position);
+        }
+
+        public static Enemy GetSpecailEnemy(EnemiesID ID, Vector2 position)
+        {
+            return new Enemy(ID, EnemyClass.Special, position);
+        }
+
+        public static Enemy GetBoss(EnemiesID ID, Vector2 position)
+        {
+            return new Enemy(ID, EnemyClass.Boss, position);
+        }
+
+        public static void Clear()
+        {
+            spawnPoint = null;
+        }
+        #endregion
+
+#region Properties
+        public static Point SpawnPoint
+        {
+            get
+            {
+                return spawnPoint.Value;
+            }
+            set
+            {
+                if (!spawnPoint.HasValue)
+                {
+                    spawnPoint = value;
+                }
+            }
+        }
+#endregion
+    }
+
     /// <summary>
     /// Base type for enemies
     /// </summary>
     public class Enemy : AutomatedSprite
     {
         #region Variables
+        static List<Enemy> enemyList = new List<Enemy>();
+
         EnemyClass eClass;
         EnemiesID ID;
 
@@ -59,7 +106,7 @@ namespace DreamCatcher
         public Enemy(Texture2D spriteSheet, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed) :
             base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize, speed)
         {
-
+            enemyList.Add(this);
         }
 
         /// <summary>
@@ -77,6 +124,7 @@ namespace DreamCatcher
             base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize, speed)
         {
             eClass = @class;
+            enemyList.Add(this);
         }
 
         /// <summary>
@@ -93,7 +141,7 @@ namespace DreamCatcher
         public Enemy(Texture2D spriteSheet, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed, int millisecondsPerFrame) :
             base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize, speed, millisecondsPerFrame)
         {
-
+            enemyList.Add(this);
         }
 
         /// <summary>
@@ -112,6 +160,7 @@ namespace DreamCatcher
             base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize, speed, millisecondsPerFrame)
         {
             eClass = @class;
+            enemyList.Add(this);
         }
 
         /// <summary>
@@ -134,6 +183,7 @@ namespace DreamCatcher
             this.attackRadius = attackRadius;
             this.visionRadius = visionRadius;
             this.jumpDelay = (int)(jumpRadius / speed.Y);
+            enemyList.Add(this);
         }
 
         /// <summary>
@@ -159,6 +209,7 @@ namespace DreamCatcher
             this.attackRadius = attackRadius;
             this.visionRadius = visionRadius;
             this.jumpDelay = (int)(jumpRadius / speed.Y);
+            enemyList.Add(this);
         }
 
         /// <summary>
@@ -186,6 +237,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             this.visionRadius = visionRadius;
             this.collisionRectangle = collisionRectangle;
             this.jumpDelay = (int)(jumpRadius / speed.Y);
+            enemyList.Add(this);
         }
 
         public Enemy(EnemyClass @class, Texture2D spriteSheet, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed, int millisecondsPerFrame, int jumpRadius, int attackRadius, Rectangle collisionRectangle, int visionRadius = 200, int health = 1, int attack = 0, int defence = 0) :
@@ -200,6 +252,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             this.health = health;
             this.attack = attack;
             this.defence = defence;
+            enemyList.Add(this);
         }
 
         public Enemy(EnemiesID ID, EnemyClass @class, Vector2 position)
@@ -244,6 +297,8 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             attack = Convert.ToInt32(table["attack_points"]);
             defence = Convert.ToInt32(table["defence_points"]);
             jumpDelay = (int)(jumpRadius / speed.Y);
+
+            enemyList.Add(this);
         }
         #endregion
 
@@ -1253,6 +1308,14 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             }
         }
 
+        /// <summary>
+        /// Deletes all of the enemies in the list. Use wisely
+        /// </summary>
+        public static void Clear()
+        {
+            enemyList.Clear();
+        }
+
         public int Attack()
         {
             state = State.Attack;
@@ -1266,6 +1329,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                 health--;
                 if (health <= 0)
                 {
+                    //Task t = new Task();
                     return true;
                 }
                 return false;
@@ -1408,6 +1472,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
         }
         #endregion
 
+#region Properties
         /// <summary>
         /// Returns center of enemy
         /// </summary>
@@ -1418,5 +1483,17 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                 return new Point(CollisionRect.X + CollisionRect.Width / 2, CollisionRect.Y + CollisionRect.Height / 2);
             }
         }
+        
+        /// <summary>
+        /// Returns list of all enemies on the level. Except of dead ones
+        /// </summary>
+        public static List<Enemy> GetEnemies
+        {
+            get
+            {
+                return enemyList;
+            }
+        }
+        #endregion
     }
 }

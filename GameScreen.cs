@@ -215,8 +215,9 @@ namespace DreamCatcher
                         }
 
                         //Логика для секреток
-                        foreach (GameScreenSpecial special in screenSpecialsList)
+                        for (int i = 0; i< screenSpecialsList.Count; i++)
                         {
+                                GameScreenSpecial special = screenSpecialsList[i];
                             if (Math.Abs(mouseState.X - special.secretPoint.X) <= special.pointOffset && Math.Abs(mouseState.Y - special.secretPoint.Y) <= special.pointOffset)
                             {
                                 if (Math.Sqrt(Math.Pow(mouseState.X - special.secretPoint.X, 2) + Math.Pow(mouseState.Y - special.secretPoint.Y, 2)) < Math.Sqrt(Math.Pow(prevMouseState.X - special.secretPoint.X, 2) + Math.Pow(prevMouseState.Y - special.secretPoint.Y, 2)))
@@ -271,17 +272,17 @@ namespace DreamCatcher
                             int x = screen[i].View.X + (int)direction.X;
                             int y = screen[i].View.Y + (int)direction.Y;
 
-                            if (x >= frameSize.X - 640)
+                            if (x >= frameSize.X - 800)
                             {
-                                x = frameSize.X - 640;
+                                x = frameSize.X - 800;
                             }
                             else if (x <= 0)
                             {
                                 x = 0;
                             }
-                            if (y >= frameSize.Y - 480)
+                            if (y >= frameSize.Y - 600)
                             {
-                                y = frameSize.Y - 480;
+                                y = frameSize.Y - 600;
                             }
                             else if (y <= 0)
                             {
@@ -322,9 +323,50 @@ namespace DreamCatcher
 
                 #region Movable
                 case ScreenType.Movable:
+                    for(int i = 0; i<screen.Length; i++)
+                    { 
+                        spriteBatch.Draw(screen[i].Texture, Vector2.Zero, screen[i].View, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.0f);
+                    }
+                    if (additionalScreens.Count != 0) foreach (GameScreen screen in additionalScreens)
+                        {
+                            screen.Draw(spriteBatch, gameTime);
+                        }
+                    break;
+                    #endregion
+            }
+
+        }
+
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime, Rectangle viewRect)
+        {
+            switch (type)
+            {
+                #region Static
+                case ScreenType.Static:
                     foreach (ScreenPart screen in screen)
                     {
-                        spriteBatch.Draw(screen.Texture, Vector2.Zero, screen.View, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.0f);
+                        spriteBatch.Draw(screen.Texture, screen.Position,
+                    new Rectangle((currentFrame.X * frameSize.X),
+                   (currentFrame.Y * frameSize.Y), frameSize.X, frameSize.Y),
+                    Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.0f);
+                    }
+                    if (additionalScreens.Count != 0) foreach (GameScreen screen in additionalScreens)
+                        {
+                            screen.Draw(spriteBatch, gameTime);
+                        }
+                    foreach (GameScreenSpecial spec in screenSpecialsList)
+                    {
+                        spriteBatch.Draw(spec.screen, spec.position, Color.White * spec.opacity);
+                    }
+                    break;
+                #endregion
+
+                #region Movable
+                case ScreenType.Movable:
+                    spriteBatch.Draw(screen[0].Texture, Vector2.Zero, viewRect, Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.0f);
+                    for (int i = 1; i<screen.Length; i++)
+                    {
+                        spriteBatch.Draw(screen[i].Texture, Vector2.Zero, new Rectangle((int)(0.75*0.75*viewRect.X), (int)(0.75*0.75*viewRect.Y), viewRect.Width, viewRect.Height), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0.0f);
                     }
                     if (additionalScreens.Count != 0) foreach (GameScreen screen in additionalScreens)
                         {

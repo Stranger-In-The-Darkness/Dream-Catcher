@@ -49,64 +49,17 @@ namespace DreamCatcher
             this.millisecondsPerFrame = millisecondsPerFrame;
         }
 
-        public Object(ObjectsID ID, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, int millisecondsPerFrame)
+        public Object(ObjectsID ID, Vector2 position)
         {
-            switch (ID)
-            {
-                case ObjectsID.Stoneberry:
-                    break;
-                case ObjectsID.Green_Potion:
-                    spriteSheet = MainClass.Load<Texture2D>(@"Images\Objects\Potions\Green Bottle");
-                    break;
-                case ObjectsID.Blue_Potion:
-                    spriteSheet = MainClass.Load<Texture2D>(@"Images\Objects\Potions\Blue Bottle");
-                    break;
-                case ObjectsID.Crystal:
-                    spriteSheet = MainClass.Load<Texture2D>("");
-                    break;
-                case ObjectsID.Lantern:
-                    spriteSheet = MainClass.Load<Texture2D>(@"Images\Objects\Lanterns\LanternAnimationV2");
-                    break;
-                case ObjectsID.Broken_Lantern:
-                    spriteSheet = MainClass.Load<Texture2D>("");
-                    break;
-            }
+            NLua.LuaTable table = (NLua.LuaTable)FileManager.ParseLuaFile($"Content\\Files\\Objects\\{ID.ToString().ToLower()}")[0];
             this.position = position;
-            this.frameSize = frameSize;
-            this.collisionOffset = collisionOffset;
-            this.currentFrame = currentFrame;
-            this.sheetSize = sheetSize;
-            this.millisecondsPerFrame = millisecondsPerFrame;
+            //To-be-added-logic
         }
 
-        public Object(ObjectsID ID, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize) :
-            this(ID, position, frameSize, collisionOffset, currentFrame, sheetSize, defaultMillisecorndsPerFrame)
+        public Object(SpecialObjectsID ID, Vector2 position)
         {
-
-        }
-
-        public Object(SpecialObjectsID ID, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, int millisecondsPerFrame)
-        {
-            switch (ID)
-            {
-                case SpecialObjectsID.Shadow_Hunter_Mask:
-                case SpecialObjectsID.Shadow_Spider_Mask:
-                case SpecialObjectsID.Shadow_Bull_Mask:
-                case SpecialObjectsID.Shadow_Boss_Mask:
-                    break;
-            }
             this.position = position;
-            this.frameSize = frameSize;
-            this.collisionOffset = collisionOffset;
-            this.currentFrame = currentFrame;
-            this.sheetSize = sheetSize;
-            this.millisecondsPerFrame = millisecondsPerFrame;
-        }
-
-        public Object(SpecialObjectsID ID, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize) :
-            this(ID, position, frameSize, collisionOffset, currentFrame, sheetSize, defaultMillisecorndsPerFrame)
-        {
-
+            //To-be-added-logc-too
         }
 
         public Object()

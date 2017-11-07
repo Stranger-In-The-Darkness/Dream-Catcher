@@ -105,9 +105,9 @@ namespace DreamCatcher
                 }
 
                 //Логика для "иконок"
-                if(state.Position.X > 0 && state.Position.X<640)
+                if(state.Position.X > 0 && state.Position.X<800)
                 {
-                    if(state.Position.Y > 0 && state.Position.Y < 480)
+                    if(state.Position.Y > 0 && state.Position.Y < 600)
                     {
 
                     }

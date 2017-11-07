@@ -62,8 +62,8 @@ namespace DreamCatcher
         Random rnd = new Random();
 
         Player player;
-        List<Enemy> enemyList = new List<Enemy>();
-        List<Lantern> lanternsList = new List<Lantern>();
+        //List<Enemy> enemyList = new List<Enemy>();
+        //List<Lantern> lanternsList = new List<Lantern>();
         List<Object> objects = new List<Object>();
 
         Region region;
@@ -81,7 +81,7 @@ namespace DreamCatcher
         //Все варианты платформ
         List<Texture2D> platformTextureList = new List<Texture2D>
         {
-            MainClass.Load<Texture2D>(@"Images\Platforms\PlatformSpriteSheet"),
+            MainClass.Load<Texture2D>(@"Images\Platforms\PlatformSpriteSheetRE"),
             MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet1V3"),
             MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet2V3"),
             MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet3"),
@@ -92,13 +92,12 @@ namespace DreamCatcher
         //Список платформ
         List<Platform[]> platformsList = new List<Platform[]>();
 
-        Rectangle frameSize = new Rectangle(0, 0, 2016, 947); //Вообще это должно задаваться в зависимости от размеров заднего фона... но я не придумал как... пока
         Rectangle viewFrame = new Rectangle(0, 347, 800, 600); //Рамка, что отрисовывать
-        Rectangle backgroundViewFrame = new Rectangle(0, 110, 800, 600);
 
         List<Obstacle> obstacles = new List<Obstacle>();
 
-        //bool levelSucced = false;
+        bool levelSucced = false;
+
         Button endLevel;
         Button goToTheCity;
         #endregion
@@ -117,32 +116,26 @@ namespace DreamCatcher
         /// <param name="objects">List of different in-game objects</param>
         /// <param name="region">In-game region</param>
         /// <param name="level">Level number</param>
-        public Level(DreamCatcherGame game, SpriteBatch spriteBatch, Player player, List<Enemy> enemyList,
+        public Level(DreamCatcherGame game, SpriteBatch spriteBatch, Player player,
             Texture2D lantern, GameScreen background, Texture2D ground, List<Object> objects, Region region, int level)
         {
             this.game = game;
             this.spriteBatch = spriteBatch;
             this.player = player;
-            this.enemyList = enemyList;
             this.lantern = lantern;
             this.background = background;
             this.ground = ground;
             this.objects = objects;
             this.region = region;
 
-            //levelGround.AddRange(new Point[] { new Point(-600, 847), new Point(-200, 847), new Point(200, 847), new Point(600, 847), new Point(1000, 847), new Point(1400, 847), new Point(1800, 847), new Point(2200, 847) });
-
-            FileManager.LoadMap(@"Content\Files\Maps\" + region.ToString() + "\\map" + level.ToString() + ".dcgm", platformTextureList, lantern, ref groundRect, ref levelGround, ref platformsList, ref lanternsList);
+            FileManager.LoadMap(@"Content\Files\Maps\" + region.ToString() + "\\map" + level.ToString() + ".dcgm", platformTextureList, lantern, ref groundRect, ref levelGround, ref platformsList);
         }
 
-        public Level(DreamCatcherGame game, SpriteBatch spriteBatch, Player player, List<Enemy> enemyList,
-            List<Lantern> lanternsList, GameScreen background, Texture2D ground, List<Platform[]> platformsList, List<Object> objects)
+        public Level(DreamCatcherGame game, SpriteBatch spriteBatch, Player player, GameScreen background, Texture2D ground, List<Platform[]> platformsList, List<Object> objects)
         {
             this.game = game;
             this.spriteBatch = spriteBatch;
             this.player = player;
-            this.enemyList = enemyList;
-            this.lanternsList = lanternsList;
             this.background = background;
             this.ground = ground;
             this.objects = objects;
@@ -156,33 +149,34 @@ namespace DreamCatcher
         public void Update(GameTime gameTime)
         {
             inputManager.Update();
+            //background.Update(gameTime, player.Direction);
 
             #region Player_Logic
-            player.Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y));
+            player.Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y - background.FrameSize.Y % 10));
             player.CollisionCheck((from pl in platformsList
                                    from p in pl
                                    select p).ToList());
             #endregion
 
             #region Enemies_Logic
-            if (enemyList.Count != 0) for (int i = 0; i < enemyList.Count; i++)
+            if (Enemy.GetEnemies.Count != 0) for (int i = 0; i < Enemy.GetEnemies.Count; i++)
                 {
-                    List<Lantern> l = (from lan in lanternsList
+                    List<Lantern> l = (from lan in Lantern.GetLanterns
                                        where lan.Active == true
                                        select lan).ToList();
                     List<Platform> p = (from plat in platformsList
                                         from pl in plat
                                         where pl.IsMaterial == true
                                         select pl).ToList();
-                    enemyList[i].Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y), p, l);
-                    if (player.CollisionRect.Intersects(enemyList[i].CollisionRect)) player.Respawn();
+                    Enemy.GetEnemies[i].Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y), p, l);
+                    if (player.CollisionRect.Intersects(Enemy.GetEnemies[i].CollisionRect)) player.Respawn();
                 }
             #endregion
 
             #region Lanterns_Logic
-            if (lanternsList.Count != 0) for (int i = 0; i < lanternsList.Count; i++)
+            if (Lantern.GetLanterns.Count != 0) for (int i = 0; i < Lantern.GetLanterns.Count; i++)
                 {
-                    lanternsList[i].Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y));
+                    Lantern.GetLanterns[i].Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y));
                 }
             #endregion
 
@@ -221,9 +215,9 @@ namespace DreamCatcher
 
             #region Ground
                 player.CollisionCheck(groundRect);
-            if (enemyList.Count != 0) for (int i = 0; i<enemyList.Count; i++)
+            if (Enemy.GetEnemies.Count != 0) for (int i = 0; i<Enemy.GetEnemies.Count; i++)
                 {
-                    enemyList[i].CollisionCheck(groundRect);
+                    Enemy.GetEnemies[i].CollisionCheck(groundRect);
                 }
             #endregion
 
@@ -232,29 +226,29 @@ namespace DreamCatcher
                 {
                     player.CollisionCheck(obstacles[i].collisionRectangle);
                 }
-            if (lanternsList.Count != 0) for (int i = 0; i<lanternsList.Count; i++)
+            if (Lantern.GetLanterns.Count != 0) for (int i = 0; i< Lantern.GetLanterns.Count; i++)
                 {
-                    if (lanternsList[i].CollisionCheck(player.CollisionRect)) lanternsList[i].Activate();
+                    if (Lantern.GetLanterns[i].CollisionCheck(player.CollisionRect)) Lantern.GetLanterns[i].Activate();
                 }
             #endregion
             #endregion
 
             #region Win_Logic
             bool win = true;
-            for (int i = 0; i < lanternsList.Count; i++)
+            for (int i = 0; i < Lantern.GetLanterns.Count; i++)
             {
-                if (!lanternsList[i].Active)
+                if (!Lantern.GetLanterns[i].Active)
                 {
                     win = false;
                     break;
                 }
             }
-            if (region!= Region.Dream && enemyList.Count != 0) win = false;
+            if (region!= Region.Dream && Enemy.GetEnemies.Count != 0) win = false;
             if (win)
             {
-                while(enemyList.Count != 0)
+                while(Enemy.GetEnemies.Count != 0)
                 {
-                    enemyList.RemoveAt(0);
+                    Enemy.GetEnemies.RemoveAt(0);
                 }
                 //MainClass.Win();
             }
@@ -266,7 +260,7 @@ namespace DreamCatcher
             try
             {
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-                background.Draw(spriteBatch, gameTime);
+                background.Draw(spriteBatch, gameTime, player.GetBackViewFrame);
                 for(int i = 0; i< levelGround.Count; i++)
                 {
                     Point r = levelGround[i];
@@ -289,17 +283,17 @@ namespace DreamCatcher
                         spriteBatch.Draw(o.texture, new Vector2(o.position.X - player.GetViewFrame.X, o.position.Y - player.GetViewFrame.Y), Color.White);
                     }
 
-                if (lanternsList.Count != 0)
-                    for (int i = 0; i<lanternsList.Count; i++)
+                if (Lantern.GetLanterns.Count != 0)
+                    for (int i = 0; i< Lantern.GetLanterns.Count; i++)
                     {
-                        Lantern l = lanternsList[i];
+                        Lantern l = Lantern.GetLanterns[i];
                         l.Draw(gameTime, new Vector2(player.GetViewFrame.X, player.GetViewFrame.Y), spriteBatch);
                     }
 
-                if (enemyList.Count != 0)
-                    for (int i = 0; i < enemyList.Count; i++)
+                if (Enemy.GetEnemies.Count != 0)
+                    for (int i = 0; i < Enemy.GetEnemies.Count; i++)
                     {
-                        Enemy e = enemyList[i];
+                        Enemy e = Enemy.GetEnemies[i];
                         e.Draw(gameTime, new Vector2(player.GetViewFrame.X, player.GetViewFrame.Y), spriteBatch);
                     }
 
@@ -308,7 +302,7 @@ namespace DreamCatcher
             }
             catch
             {
-                background.Draw(spriteBatch, gameTime);
+                background.Draw(spriteBatch, gameTime, player.GetBackViewFrame);
                 for (int i = 0; i < levelGround.Count; i++)
                 {
                     Point r = levelGround[i];
@@ -322,9 +316,9 @@ namespace DreamCatcher
                         p2.Draw(gameTime, new Vector2(viewFrame.X, viewFrame.Y), spriteBatch);
                     }
                 }
-                if (lanternsList.Count != 0) for (int i = 0; i < lanternsList.Count; i++)
+                if (Lantern.GetLanterns.Count != 0) for (int i = 0; i < Lantern.GetLanterns.Count; i++)
                     {
-                        Lantern l = lanternsList[i];
+                        Lantern l = Lantern.GetLanterns[i];
                         l.Draw(gameTime, new Vector2(viewFrame.X, viewFrame.Y), spriteBatch);
                     }
                 if (obstacles.Count != 0) for (int i = 0; i < obstacles.Count; i++)
@@ -333,9 +327,9 @@ namespace DreamCatcher
                         spriteBatch.Draw(o.texture, new Vector2(o.position.X - viewFrame.X, o.position.Y - viewFrame.Y), Color.White);
                     }
 
-                if (enemyList.Count != 0) for (int i = 0; i < enemyList.Count; i++)
+                if (Enemy.GetEnemies.Count != 0) for (int i = 0; i < Enemy.GetEnemies.Count; i++)
                     {
-                        Enemy e = enemyList[i];
+                        Enemy e = Enemy.GetEnemies[i];
                         e.Draw(gameTime, new Vector2(viewFrame.X, viewFrame.Y), spriteBatch);
                     }
 
@@ -408,8 +402,8 @@ namespace DreamCatcher
                             foreach (string s in str.Split('|'))
                             {
                                 string s2 = s.Substring(s.IndexOf('<') + 1, s.Length - 2).Replace(">","");
-                                lanternsList.Add(new Lantern(lantern, (start + new Point(block.X * int.Parse(s2.Split(',')[0]), block.Y * int.Parse(s2.Split(',')[1]))).ToVector2(),
-                                    new Point(30, 40), 0, new Point(0, 0), new Point(4, 2)));
+                                new Lantern(lantern, (start + new Point(block.X * int.Parse(s2.Split(',')[0]), block.Y * int.Parse(s2.Split(',')[1]))).ToVector2(),
+                                    new Point(30, 40), 0, new Point(0, 0), new Point(4, 2));
                             }
                         }
                         break;

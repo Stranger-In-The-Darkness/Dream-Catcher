@@ -304,7 +304,7 @@ namespace DreamCatcher
         }
         #endregion
 
-        public static void LoadMap(string path, List<Microsoft.Xna.Framework.Graphics.Texture2D> platformTextureList, Microsoft.Xna.Framework.Graphics.Texture2D lantern, ref Rectangle groundRect, ref List<Point> levelGround, ref List<Platform[]> platformsList, ref List<Lantern> lanternsList)
+        public static void LoadMap(string path, List<Microsoft.Xna.Framework.Graphics.Texture2D> platformTextureList, Microsoft.Xna.Framework.Graphics.Texture2D lantern, ref Rectangle groundRect, ref List<Point> levelGround, ref List<Platform[]> platformsList)
         {
             StreamReader r = new StreamReader(path);
             string @string = "";
@@ -390,8 +390,8 @@ namespace DreamCatcher
                             foreach (string s in str.Split('|'))
                             {
                                 string s2 = s.Substring(s.IndexOf('<') + 1, s.Length - 2).Replace(">", "");
-                                lanternsList.Add(new Lantern(lantern, (start + new Point(block.X * int.Parse(s2.Split(',')[0]), block.Y * int.Parse(s2.Split(',')[1]))).ToVector2(),
-                                    new Point(30, 40), 0, new Point(0, 0), new Point(4, 2)));
+                                new Lantern(lantern, (start + new Point(block.X * int.Parse(s2.Split(',')[0]), block.Y * int.Parse(s2.Split(',')[1]))).ToVector2(),
+                                    new Point(40, 40), 0, new Point(0, 0), new Point(4, 4));
                             }
                         }
                         break;

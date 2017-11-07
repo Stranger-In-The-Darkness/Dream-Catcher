@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +33,7 @@ namespace DreamCatcher
             List<Lantern> lanternsList = new List<Lantern>();
             List<Object> objects = new List<Object>();
 
-            Texture2D background;
+            Texture2D[] background = new Texture2D[0];
             Texture2D ground;
 
             List<Texture2D> foreground = new List<Texture2D>();
@@ -76,17 +78,65 @@ namespace DreamCatcher
 
         private void LoadLevel()
         {
-            Thread.Sleep(1000);
-            background = Game.Content.Load<Texture2D>(@"Images\Backgrounds\Background" + Level);
-            ground = Game.Content.Load<Texture2D>((@"Images\Backgrounds\Ground" + Level).ToString());
+            NLua.LuaTable table = null;
+            switch (region)
+            {
+                //f, v, c, r
+                case Region.Dream:
+                default:
+                    table = (NLua.LuaTable)FileManager.ParseLuaFile($"Content\\Files\\Level\\d_{Level}.lua")[0];
+                    break;
+            }
+            NLua.LuaTable tabl = (NLua.LuaTable) table["background"];
+            background = new Texture2D[tabl.Keys.Count];
+            for(int i = 0; i<tabl.Values.Count; i++)
+            {
+                background[i] = Game.Content.Load<Texture2D>(tabl[i].ToString());
+            }
+            //background[0] = Game.Content.Load<Texture2D>(@"Images\Backgrounds\Background" + Level);
+            ground = Game.Content.Load<Texture2D>(table["ground"].ToString());
             Texture2D lantern = Game.Content.Load<Texture2D>(@"Images\Objects\Lanterns\LanternAnimation");
-            //enemyList.Add(new Enemy(EnemyClass.Basic, MainClass.Load<Texture2D>(@"Images\Enemies\EnemyAnimation1V2"), new Vector2(1800, 869 - 128),
-            //    new Point(101, 130), 0, new Point(0, 0), new Point(8, 4), new Vector2(1.7f, 1.5f), 80, 140, 50, new Rectangle(20, 0, 60, 130)));
-            enemyList.Add(new Enemy(EnemiesID.Shadow_Hunter, EnemyClass.Basic, new Vector2(1800, 869 - 128)));
-            level = new Level(game, spriteBatch, player, enemyList, lantern,
-                new GameScreen(ScreenType.Movable, new Texture2D[] { background }, background.Bounds.Size, Point.Zero, new Point(1, 1), 0, 0),
+            try
+            {
+                for(int i = 0; i < ((NLua.LuaTable)table["enemy"]).Keys.Count; i++)
+                {
+                    tabl = (NLua.LuaTable)((NLua.LuaTable)((NLua.LuaTable)table["enemy"])[i]);
+                    enemyList.Add(new Enemy(
+                        tabl["id"].ToString() == "shadow_hunter" ? EnemiesID.Shadow_Hunter : EnemiesID.Shadow_Hunter, 
+                        tabl["class"].ToString() == "basic" ? EnemyClass.Basic : EnemyClass.Basic, 
+                        new Vector2(
+                            Convert.ToInt32(((NLua.LuaTable)tabl["position"])["x"]), 
+                            Convert.ToInt32(((NLua.LuaTable)tabl["position"])["y"]))
+                            )
+                            );
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            try
+            {
+                for (int i = 0; i < ((NLua.LuaTable)table["object"]).Keys.Count; i++)
+                {
+                    tabl = (NLua.LuaTable)((NLua.LuaTable)((NLua.LuaTable)table["object"])[$"{i + 1}"]);
+                    objects.Add(new Object(
+                        tabl["id"].ToString() == "stoneberry" ? ObjectsID.Stoneberry : ObjectsID.Stoneberry,
+                        new Vector2(
+                            Convert.ToInt32(((NLua.LuaTable)tabl["position"])["x"]),
+                            Convert.ToInt32(((NLua.LuaTable)tabl["position"])["y"]))
+                            )
+                            );
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            level = new Level(game, spriteBatch, player, lantern,
+                new GameScreen(ScreenType.Movable, background, background[0].Bounds.Size, Point.Zero, new Point(1, 1), 0, 0),
                 ground, objects, region, 0);
-            Thread.Sleep(1000);
             MainClass.Game.IsLoading = false;
         }
 

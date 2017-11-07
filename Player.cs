@@ -125,9 +125,21 @@ namespace DreamCatcher
         public override void Update(GameTime gameTime, Rectangle clientBounds)
         {
             #region Bounds_Logic
-            if (position.X < 0) position.X = 0;
-            if (position.X > clientBounds.Width / 0.75 - frameSize.X) position.X = clientBounds.Width / 0.75f - frameSize.X;
-            if (position.Y > yBound + 20) { position.Y = yBound + 20; state = State.Stay; }
+            if (position.X < 0)
+            {
+                position.X = 0;
+            }
+            if (position.X > clientBounds.Width / 0.75 - frameSize.X)
+            {
+                position.X = clientBounds.Width / 0.75f - frameSize.X;
+            }
+            if (position.Y >= yBound + 20)
+            {
+                position.Y = yBound + 20;
+                state = State.Stay;
+                gravityOn = false;
+                isGrounded = true;
+            }
             #endregion
 
             inputManager.Update();
@@ -135,16 +147,6 @@ namespace DreamCatcher
             position += Direction;
 
             #region View_Logic
-            backFrame.X = (int)(0.75 * (GetCenter.X - 400));
-            backFrame.Y = (int)(0.75 * (GetCenter.Y - 300));
-
-            backFrame.X = backFrame.X < 0 ?
-                0 : backFrame.X > clientBounds.Width - 800 ?
-                clientBounds.Width - 800 : backFrame.X;
-            backFrame.Y = backFrame.Y < 0 ?
-                0 : backFrame.Y > clientBounds.Height - 600 ?
-                clientBounds.Height - 600 : backFrame.Y;
-
             viewFrame.X = (int)(GetCenter.X - 400);
             viewFrame.Y = (int)(GetCenter.Y - 300);
 
@@ -154,6 +156,16 @@ namespace DreamCatcher
             viewFrame.Y = viewFrame.Y < 0 ?
                 0 : viewFrame.Y > clientBounds.Height / 0.75 - 600 ?
                 (int)(clientBounds.Height / 0.75) - 600 : viewFrame.Y;
+
+            backFrame.X = (int)((0.75 * 0.75) * viewFrame.X);
+            backFrame.Y = (int)(0.75 * viewFrame.Y);
+
+            backFrame.X = backFrame.X < 0 ?
+                0 : backFrame.X > clientBounds.Width - 800 ?
+                clientBounds.Width - 800 : backFrame.X;
+            backFrame.Y = backFrame.Y < 0 ?
+                0 : backFrame.Y > clientBounds.Height - 600 ?
+                clientBounds.Height - 600 : backFrame.Y;
             #endregion
 
             switch (state)
@@ -301,8 +313,8 @@ namespace DreamCatcher
                     currentFrame.Y = (sheetSize.Y * 2) / 3;
                     dir = (dir == Dir.Left || dir == Dir.Left_Up) ? dir = Dir.Left_Down : (dir == Dir.Right || dir == Dir.Right_Up) ? Dir.Right_Down : dir;
                 }
-                speed.Y -= 0.06f;
-                speed.Y = speed.Y < -25 ? -25 : speed.Y;
+                speed.Y -= 0.20f;
+                speed.Y = speed.Y < -10 ? -10 : speed.Y;
             }
             #endregion
         }
@@ -491,7 +503,7 @@ namespace DreamCatcher
                 {
                     //Если игрок над платформой, то он останавливается на ней
                     if (CollisionRect.Bottom - r.Top > 0
-                        && CollisionRect.Bottom - r.Top < 10)
+                        && CollisionRect.Bottom - r.Top < 15)
                     {
                         if (state == State.Jump)
                         {
@@ -511,7 +523,7 @@ namespace DreamCatcher
                         || !(dir == Dir.Right && (r.Left - CollisionRect.Left < -30)))
                     {
                         if (CollisionRect.Bottom - r.Top > 0
-                            && CollisionRect.Bottom - r.Top < 10)
+                            && CollisionRect.Bottom - r.Top < 15)
                         {
                             speed.Y = 0;
                             isGrounded = true;
@@ -619,7 +631,7 @@ namespace DreamCatcher
                         currentFrame.Y = (sheetSize.Y * 2) / 3;
                     }
                     inputDirection.Y -= 1;
-                    speed.Y = 3.3f;
+                    speed.Y = 6.5f;
                     gravityOn = true;
                     if (dir == Dir.Left) dir = Dir.Left_Up;
                     else if (dir == Dir.Right) dir = Dir.Right_Up;
@@ -642,7 +654,9 @@ namespace DreamCatcher
         /// </summary>
         public override Rectangle CollisionRect
         {
-            get { if (!collision.HasValue) return new Rectangle((int)position.X + collisionOffset, (int)position.Y + collisionOffset, frameSize.X - collisionOffset, frameSize.Y - collisionOffset);
+            get
+            { if (!collision.HasValue)
+                    return new Rectangle((int)position.X + collisionOffset, (int)position.Y + collisionOffset, frameSize.X - collisionOffset, frameSize.Y - collisionOffset);
                 else return new Rectangle((int)position.X + collision.Value.X, (int)position.Y + collision.Value.Y, collision.Value.Width - collisionOffset, collision.Value.Height - collisionOffset);
             }
         }

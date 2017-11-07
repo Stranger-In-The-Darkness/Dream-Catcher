@@ -16,7 +16,7 @@ namespace DreamCatcher
     static class MainClass
     {
         #region Variabes
-        public static Point currentFrameSize = new Point(640, 480);
+        public static Point currentFrameSize = new Point(800, 600);
 
         //"Центр" отрисовываемого фона
         static Point center = new Point(0, 0);
@@ -40,6 +40,7 @@ namespace DreamCatcher
         public static float SFXLevel = 1.0f; //Звуковые эффекты
         public static float MusicLevel = 1.0f; //Музыка
         public static bool helpEnabled = true; //"Помощь"
+        public static Point resolution = new Point(800, 600);
         #endregion
 
         #region Properties

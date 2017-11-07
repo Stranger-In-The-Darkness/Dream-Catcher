@@ -15,8 +15,10 @@ namespace DreamCatcher
     public class Lantern : Object
     {
         #region Variables
-        private bool isActive = false; //Работает фонарик, или нет
-        private bool activation = false; //Переменная отвечает за "включение/выключение" фонариков
+        static List<Lantern> lanternList = new List<Lantern>();
+
+        bool isActive = false; //Работает фонарик, или нет
+        bool activation = false; //Переменная отвечает за "включение/выключение" фонариков
         int health = 3;
         #endregion
 
@@ -24,7 +26,7 @@ namespace DreamCatcher
         public Lantern(Texture2D spriteSheet, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, string ID = "lantern"):
             base(ID, spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize)
         {
-
+            lanternList.Add(this);
         }
         #endregion
 
@@ -47,8 +49,8 @@ namespace DreamCatcher
 
                         if (currentFrame.Y >= sheetSize.Y)
                         {
-                            currentFrame.Y = sheetSize.Y - 1;
-                            currentFrame.X = sheetSize.X - 1;
+                            currentFrame.Y = sheetSize.Y/2 - 1;
+                            currentFrame.X = sheetSize.X/2 - 1;
                             activation = false;
                         }
                     }
@@ -96,10 +98,21 @@ namespace DreamCatcher
             }
         }
 
+        /// <summary>
+        /// Deletes all of the current lanterns. Use wisely!
+        /// </summary>
+        public static void Clear()
+        {
+            lanternList.Clear();
+        }
+
         public void Activate()
         {
-            Active = true;
-            activation = true;
+            if (!Active)
+            {
+                Active = true;
+                activation = true;
+            }
         }
 
         public bool Attack()
@@ -145,6 +158,14 @@ namespace DreamCatcher
         {
             get { return isActive; }
             private set { isActive = value; }
+        }
+
+        public static List<Lantern> GetLanterns
+        {
+            get
+            {
+                return lanternList;
+            }
         }
         #endregion
     }

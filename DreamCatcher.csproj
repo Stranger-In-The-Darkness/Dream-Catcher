@@ -14,6 +14,21 @@
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -23,7 +38,7 @@
     <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>1</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -40,10 +55,14 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>DreamCatcher.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="AutomatedSprite.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="Button.cs" />
+    <Compile Include="CheckBox.cs" />
     <Compile Include="DreamCatcherGame.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="EnemysManager.cs" />
@@ -61,6 +80,7 @@
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slider.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteManager.cs" />
     <Compile Include="Symbol.cs" />
@@ -103,6 +123,7 @@
     <Content Include="Content\Images\Objects\Potions\Green Bottle.png" />
     <Content Include="Content\Images\OptionsButtonV2.png" />
     <Content Include="Content\Images\Platforms\PlatformSpriteSheet.png" />
+    <Content Include="Content\Images\Platforms\PlatformSpriteSheetRE.png" />
     <Content Include="Content\Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet1.png" />
     <Content Include="Content\Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet1V3.png" />
     <Content Include="Content\Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet2.png" />
@@ -148,9 +169,13 @@
     </Content>
     <None Include="Content\Files\Enemies\b_shadow_hunter.lua" />
     <None Include="Content\Files\Enemies\enemy.lua" />
+    <None Include="Content\Files\Level\d_0.lua" />
+    <None Include="Content\Files\Level\level.lua" />
     <None Include="Content\Fonts\Arial.spritefont" />
+    <None Include="Content\Fonts\Chiller.spritefont" />
     <None Include="Content\Fonts\ComicSans.spritefont" />
     <None Include="Content\Fonts\Curlz.spritefont" />
+    <None Include="Content\Fonts\Gigi.spritefont" />
     <None Include="Content\Fonts\Papyrus.spritefont" />
     <None Include="packages.config" />
     <None Include="settings.dcset">
@@ -168,6 +193,13 @@
     <Folder Include="Content\Images\Objects\Masks\" />
     <Folder Include="Content\Images\Objects\Specials\" />
     <Folder Include="Content\Images\Obstacles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

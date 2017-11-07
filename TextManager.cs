@@ -12,8 +12,10 @@ namespace DreamCatcher
     {
         SpriteFont arial;
         SpriteFont curlz;
+        SpriteFont chiller;
         SpriteFont sans;
         SpriteFont papyrus;
+        SpriteFont gigi;
 
         Texture2D textFrame;
         SpriteBatch spriteBatch;
@@ -35,6 +37,8 @@ namespace DreamCatcher
             curlz = MainClass.Load<SpriteFont>(@"Fonts\Curlz");
             papyrus = MainClass.Load<SpriteFont>(@"Fonts\Papyrus");
             sans = MainClass.Load<SpriteFont>(@"Fonts\ComicSans");
+            chiller = MainClass.Load<SpriteFont>(@"Fonts\Chiller");
+            gigi = MainClass.Load<SpriteFont>(@"Fonts\Gigi");
             textFrame = MainClass.Load<Texture2D>(@"Images\Frame");
         }
 
@@ -67,7 +71,7 @@ namespace DreamCatcher
         public void DialogDraw(GameTime gameTime, Fonts font, string text, Color color)
         {
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
-            spriteBatch.Draw(textFrame, new Rectangle(80, 380, 640, 160), Color.White);
+            spriteBatch.Draw(textFrame, new Rectangle(80, 380, 800, 160), Color.White);
             switch (font)
             {
                 case Fonts.Arial:

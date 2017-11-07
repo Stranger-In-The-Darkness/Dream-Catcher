@@ -28,7 +28,7 @@ namespace DreamCatcher
 
         LevelManager levelManager;
 
-        //TextManager textManager;
+        TextManager textManager;
 
         InputManager inputManager = new InputManager();
         #endregion
@@ -48,49 +48,49 @@ namespace DreamCatcher
         Texture2D Pointer;
         Vector2 pointerPosition = Vector2.Zero;
         Point pointerFrameSize = new Point(47, 64);
-        int pointerOffset = 5;
+        int pointerOffset = 15;
         #endregion
 
         #region Buttons
         Texture2D playButton;
         Vector2 playButtonPosition = new Vector2();
         Point playButtonFrameSize = new Point(136, 106);
-        int playButtonOffset = 10;
+        int playButtonOffset = 20;
         float playButtonOpacity = 0.0f;
         bool playButtonIsPressed = false;
 
         Texture2D optionsButton;
         Vector2 optionsButtonPosition = new Vector2();
         Point optionsButtonFrameSize = new Point(136, 106);
-        int optionsButtonOffset = 10;
+        int optionsButtonOffset = 20;
         float optionsButtonOpacity = 0.0f;
         bool optionsButtonIsPressed = false;
 
         Texture2D exitButton;
         Vector2 exitButtonPosition = new Vector2();
         Point exitButtonFrameSize = new Point(136, 106);
-        int exitButtonOffset = 10;
+        int exitButtonOffset = 20;
         float exitButtonOpacity = 0.0f;
         bool exitButtonIsPressed = false;
 
         Texture2D applyButton;
         Vector2 applyButtonPosition = new Vector2();
         Point applyButtonFrameSize = new Point(136, 106);
-        int applyButtonOffset = 10;
+        int applyButtonOffset = 20;
         float applyButtonOpacity = 0.0f;
         bool applyButtonIsPressed = false;
 
         Texture2D resumeButton;
         Vector2 resumeButtonPosition = new Vector2();
         Point resumeButtonFrameSize = new Point(136, 106);
-        int resumeButtonOffset = 10;
+        int resumeButtonOffset = 20;
         float resumeButtonOpacity = 0.0f;
         bool resumeButtonIsPressed = false;
 
         Texture2D quitButton;
         Vector2 quitButtonPosition = new Vector2();
         Point quitButtonFrameSize = new Point(136, 106);
-        int quitButtonOffset = 10;
+        int quitButtonOffset = 20;
         float quitButtonOpacity = 0.0f;
         bool quitButtonIsPressed = false;
         #endregion
@@ -135,15 +135,25 @@ namespace DreamCatcher
 
             MainClass.Game = this;
 
-            player = new Player(Content.Load<Texture2D>(@"Images\Player\OwlAnimation"), new Vector2(0, 739), new Point(101, 130), 10, new Point(0, 0), new Point(8, 6), new Vector2(1.6f, 0), 70, new Rectangle(20, 0, 60, 130));
+            player = new Player(
+                Content.Load<Texture2D>(@"Images\Player\OwlAnimation"),
+                new Vector2(0, 739), new Point(101, 130), 10,
+                new Point(0, 0), new Point(8, 6),
+                new Vector2(1.6f, 0), 70, new Rectangle(20, 0, 60, 130));
 
             #region Managers
-            symbolManager = new SymbolManager(this, new Rectangle((int)playButtonPosition.X, (int)playButtonPosition.Y, (int)quitButtonPosition.X + quitButtonFrameSize.X, (int)quitButtonPosition.Y + quitButtonFrameSize.Y));
+            symbolManager = new SymbolManager(
+                this,
+                new Rectangle(
+                    (int)playButtonPosition.X, 
+                    (int)playButtonPosition.Y, 
+                    (int)quitButtonPosition.X + quitButtonFrameSize.X, 
+                    (int)quitButtonPosition.Y + quitButtonFrameSize.Y));
             levelManager = new LevelManager(this, player);
-            //textManager = new TextManager(this);
+            textManager = new TextManager(this);
 
             Components.Add(symbolManager);
-            //Components.Add(textManager);
+            Components.Add(textManager);
             base.Initialize();
             #endregion
 
@@ -157,10 +167,27 @@ namespace DreamCatcher
             #endregion
 
 
-            loading = new GameScreen(ScreenType.Static, new Texture2D[] { Content.Load<Texture2D>(@"Images\Screens\LoadingScreen") }, new Vector2(700, 500), new Point(6, 0), new Point(300, 300), new Point(6, 0), new Point(3, 6), 0, 60);
+            loading = new GameScreen(
+                ScreenType.Static, 
+                new Texture2D[] {
+                    Content.Load<Texture2D>(@"Images\Screens\LoadingScreen") }, 
+                new Vector2(700, 500), 
+                new Point(6, 0), 
+                new Point(300, 300), 
+                new Point(6, 0), 
+                new Point(3, 6), 0, 60);
 
-            gameOver = new GameScreen(ScreenType.Static, new Texture2D[] { Content.Load<Texture2D>(@"Images\Screens\GameOverScreen") }, new Point(640, 480), new Point(2, 0), new Point(4, 2), 0, 100);
-            gameOver.AddSpecial(Content.Load<Texture2D>(@"Images\Screens\GameOverScreenSpecial"), new Vector2(80, 60), new Point(640, 480), new Point(430, 295), 30);
+            gameOver = new GameScreen(
+                ScreenType.Static, 
+                new Texture2D[] { Content.Load<Texture2D>(@"Images\Screens\GameOverScreen") }, 
+                new Point(640, 480), 
+                new Point(2, 0), 
+                new Point(4, 2), 0, 100);
+            gameOver.AddSpecial(
+                Content.Load<Texture2D>(@"Images\Screens\GameOverScreenSpecial"), 
+                new Vector2(80, 60), 
+                new Point(640, 480), 
+                new Point(430, 295), 30);
 
             if (!MediaPlayer.GameHasControl)
             {
@@ -203,6 +230,18 @@ namespace DreamCatcher
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            spriteBatch.Dispose();
+            symbolManager.Dispose();
+            levelManager.Dispose();
+            textManager.Dispose();
+
+            Pointer.Dispose();
+
+            playButton.Dispose();
+            optionsButton.Dispose();
+            exitButton.Dispose();
+            applyButton.Dispose();
+            quitButton.Dispose();
         }
 
         /// <summary>
@@ -311,8 +350,17 @@ namespace DreamCatcher
                         #endregion
 
                         #region Button_Clicks
-                        if (Collide(new Rectangle((int)pointerPosition.X, (int)pointerPosition.Y, pointerFrameSize.X - pointerOffset, pointerFrameSize.Y - pointerOffset),
-     new Rectangle((int)playButtonPosition.X + playButtonOffset, (int)playButtonPosition.Y + playButtonOffset, playButtonFrameSize.X - playButtonOffset, playButtonFrameSize.Y - playButtonOffset)))
+                        if (Collide(
+                            new Rectangle(
+                                (int)pointerPosition.X, 
+                                (int)pointerPosition.Y, 
+                                10, 
+                                10),
+                            new Rectangle(
+                                (int)playButtonPosition.X + playButtonOffset, 
+                                (int)playButtonPosition.Y + playButtonOffset, 
+                                playButtonFrameSize.X - playButtonOffset, 
+                                playButtonFrameSize.Y - playButtonOffset)))
                         {
                             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                             {
@@ -327,8 +375,18 @@ namespace DreamCatcher
                             }
                         }
 
-                        else if (Collide(new Rectangle((int)pointerPosition.X, (int)pointerPosition.Y, pointerFrameSize.X - pointerOffset, pointerFrameSize.Y - pointerOffset),
-                            new Rectangle((int)optionsButtonPosition.X + optionsButtonOffset, (int)optionsButtonPosition.Y + optionsButtonOffset, optionsButtonFrameSize.X - optionsButtonOffset, optionsButtonFrameSize.Y - optionsButtonOffset)))
+                        else if (
+                            Collide(
+                                new Rectangle(
+                                    (int)pointerPosition.X, 
+                                    (int)pointerPosition.Y, 
+                                    10, 
+                                    10),
+                                new Rectangle(
+                                    (int)optionsButtonPosition.X + optionsButtonOffset, 
+                                    (int)optionsButtonPosition.Y + optionsButtonOffset, 
+                                    optionsButtonFrameSize.X - optionsButtonOffset, 
+                                    optionsButtonFrameSize.Y - optionsButtonOffset)))
                         {
                             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                             {
@@ -343,8 +401,18 @@ namespace DreamCatcher
                             }
                         }
 
-                        else if (Collide(new Rectangle((int)pointerPosition.X, (int)pointerPosition.Y, pointerFrameSize.X - pointerOffset, pointerFrameSize.Y - pointerOffset),
-                            new Rectangle((int)exitButtonPosition.X + exitButtonOffset, (int)exitButtonPosition.Y + exitButtonOffset, exitButtonFrameSize.X - exitButtonOffset, exitButtonFrameSize.Y - exitButtonOffset)))
+                        else if (
+                            Collide(
+                                new Rectangle(
+                                    (int)pointerPosition.X, 
+                                    (int)pointerPosition.Y, 
+                                    10, 
+                                    10),
+                                new Rectangle(
+                                    (int)exitButtonPosition.X + exitButtonOffset, 
+                                    (int)exitButtonPosition.Y + exitButtonOffset, 
+                                    exitButtonFrameSize.X - exitButtonOffset, 
+                                    exitButtonFrameSize.Y - exitButtonOffset)))
                         {
                             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                             {
@@ -687,7 +755,7 @@ namespace DreamCatcher
                 #region Help
                 case GameState.Help:
                     GraphicsDevice.Clear(Color.Black);
-                    //textManager.Draw(gameTime, Fonts.CurlzMT, "[A], [D] - to move\n[W] - to jump\n[I] - to open inventory\n[Q] - to attack\n[E] - to act\n\nPress any key, to continue...", new Vector2(120, 60), Color.White);
+                    textManager.Draw(gameTime, Fonts.CurlzMT, "[A], [D] - to move\n[W] - to jump\n[I] - to open inventory\n[Q] - to attack\n[E] - to act\n\nPress any key, to continue...", new Vector2(120, 60), Color.White);
                     break;
                 #endregion
                 #region Options
@@ -727,7 +795,7 @@ namespace DreamCatcher
                     {
                         GraphicsDevice.Clear(Color.Black);
                         gameOver.Draw(spriteBatch, gameTime);
-                        //textManager.Draw(gameTime, Fonts.CurlzMT, "Press [Enter]...", new Vector2(80, 420), new Color(152, 255, 71));
+                        textManager.Draw(gameTime, Fonts.CurlzMT, "Press [Enter]...", new Vector2(80, 420), new Color(152, 255, 71));
 
                         break;
                     }
@@ -737,6 +805,7 @@ namespace DreamCatcher
                     {
                         GraphicsDevice.Clear(Color.Black);
                         loading.Draw(spriteBatch, gameTime, 0.25f);
+                        textManager.Draw(gameTime, Fonts.CurlzMT, "Loading...", new Vector2(20, 420), new Color(152, 255, 71));
                     }
                     break;
                     #endregion
