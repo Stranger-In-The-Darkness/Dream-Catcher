@@ -10,9 +10,11 @@ using Microsoft.Xna.Framework.Content;
 
 namespace DreamCatcher
 {
-    public class Platform
+    public class Platform : INode<Platform>
     {
         #region Variables
+        static List<Platform> platformsList = new List<Platform>();
+
         Texture2D platformSpriteSheet;
         Point platformSheetSize;
         Point platformFrameSize;
@@ -24,6 +26,9 @@ namespace DreamCatcher
 
         bool isMaterialized = false;
         bool isActivated = false;
+
+        List<Platform> connectedNodes = new List<Platform>();
+        int nodeIndex = 0;
         #endregion
 
         #region Constructors
@@ -43,6 +48,12 @@ namespace DreamCatcher
             platformSheetSize = sheetSize;
             platformFrameSize = frameSize;
             platformCurrentFrame = currentFrame;
+            platformsList.Add(this);
+
+            if (platformsList.Last().CollisionRect.Intersects(this.CollisionRect))
+            {
+                ConnectNodes(this, platformsList.Last());
+            }
         }
 
         /// <summary>
@@ -63,6 +74,12 @@ namespace DreamCatcher
             platformFrameSize = frameSize;
             platformCurrentFrame = currentFrame;
             this.millisecondsPerFrame = millisecondsPerFrame;
+            platformsList.Add(this);
+
+            if (platformsList.Last().CollisionRect.Intersects(this.CollisionRect))
+            {
+                ConnectNodes(this, platformsList.Last());
+            }
         }
 
         /// <summary>
@@ -83,6 +100,12 @@ Point currentFrame, bool isMaterialized)
             platformFrameSize = frameSize;
             platformCurrentFrame = currentFrame;
             this.isMaterialized = isMaterialized;
+            platformsList.Add(this);
+
+            if (platformsList.Last().CollisionRect.Intersects(this.CollisionRect))
+            {
+                ConnectNodes(this, platformsList.Last());
+            }
         }
 
         /// <summary>
@@ -94,6 +117,9 @@ Point currentFrame, bool isMaterialized)
             platformPosition = new Point(p.CollisionRect.X, p.CollisionRect.Y).ToVector2();
             platformFrameSize = new Point(p.CollisionRect.Width, p.CollisionRect.Height);
             isMaterialized = true;
+            platformsList.Add(this);
+
+            this.connectedNodes = p.connectedNodes;
         }
         #endregion
 
@@ -168,6 +194,41 @@ Point currentFrame, bool isMaterialized)
         public override string ToString()
         {
             return platformPosition.X + " " + platformPosition.Y;
+        }
+
+        public Platform Next()
+        {
+            try
+            {
+                return connectedNodes[nodeIndex];
+            }
+            catch (Exception e)
+            {
+                Info.WriteLog($"\n{e.StackTrace} \n{e.Message} \n{e.TargetSite}");
+                return null;
+            }
+        }
+
+        public Platform Value()
+        {
+            return this;
+        }
+
+        public static void ConnectNodes(Platform p1, Platform p2)
+        {
+            p1.AddNode(p2);
+            p2.AddNode(p1);
+        }
+
+        public void AddNode(Platform p)
+        {
+            connectedNodes.Add(p);
+        }
+
+        public void Dispose()
+        {
+            if(!this.platformSpriteSheet.IsDisposed) this.platformSpriteSheet.Dispose();
+            connectedNodes.Clear();
         }
         #endregion
 

@@ -5,37 +5,107 @@
     /// <summary>
     /// Used to change between game states
     /// </summary>
-    public enum GameState { Menu, Gameplay, Pause, Options, LevelWin, GameOver, Help, Loading, Cutscene }
+    public enum GameState
+    {
+        Menu,
+        Gameplay,
+        Pause,
+        Options,
+        LevelWin,
+        GameOver,
+        Help,
+        Loading,
+        Cutscene
+    }
 
     /// <summary>
-    /// Type of game screen. Movable - for background. Static - for scenes
+    /// Type of game screen
     /// </summary>
-    public enum ScreenType { Movable, Static }
+    public enum ScreenType
+    {
+        /// <summary>
+        /// На задний фон
+        /// </summary>
+        Movable,
+
+        /// <summary>
+        /// Для статичных изображений
+        /// </summary>
+        Static
+    }
 
     /// <summary>
     /// Player and enemy state
     /// </summary>
-    public enum State { Stay, Walk, Jump, Attack, Landed }
+    public enum State
+    {
+        Stay,
+        Walk,
+        Jump,
+        Attack,
+        Landed
+    }
 
     /// <summary>
     /// Direction
     /// </summary>
-    public enum Dir { Left_Down, Left, Left_Up, Right_Down, Right, Right_Up }
+    public enum Dir
+    {
+        Down,
+        Left_Down,
+        Left,
+        Left_Up,
+        Up,
+        Right_Up,
+        Right,
+        Right_Down
+    }
 
     /// <summary>
     /// Class of enemy
     /// </summary>
-    public enum EnemyClass { Basic, Special, Boss }
+    public enum EnemyClass
+    {
+        /// <summary>
+        /// Просто ходит по заданому маршруту
+        /// </summary>
+        Basic,
+
+        /// <summary>
+        /// Преследует игрока
+        /// </summary>
+        Special,
+
+        /// <summary>
+        /// Босс. Поведение зависит от самого босса
+        /// </summary>
+        Boss
+    }
 
     /// <summary>
     /// Supported fonts
     /// </summary>
-    public enum Fonts { Arial, CurlzMT, Papyrus, Sans }
+    public enum Fonts
+    {
+        Arial,
+        CurlzMT,
+        Papyrus,
+        Sans,
+        Gigi,
+        Chiller
+    }
 
     /// <summary>
     /// In-game regions
     /// </summary>
-    public enum Region { Dream, Forest, City, Cave, Ruins }
+    public enum Region
+    {
+        Dream,
+        Forest,
+        City,
+        Cave,
+        Ruins
+    }
 
 
     /// <summary>
@@ -46,15 +116,72 @@
     /// <summary>
     /// In-game enemies
     /// </summary>
-    public enum EnemiesID { Shadow_Hunter, Shadow_Spider, Shadow_Bull, Shadow_Flier, Shadow_Croc, Shadow_Oak_Boss};
+    public enum EnemiesID
+    {
+        Shadow_Hunter,
+        Shadow_Spider,
+        Shadow_Horner,
+
+        /// <summary>
+        /// Предполагаемый летучий враг
+        /// </summary>
+        Shadow_Flier,
+
+        /// <summary>
+        /// Как варинат, Тень-крокодил
+        /// </summary>
+        Shadow_Croc,
+        Shadow_Oak_Boss };
 
     /// <summary>
     /// Basic in-game objects
     /// </summary>
-    public enum ObjectsID { Stoneberry, Green_Potion, Blue_Potion, Crystal, Lantern, Broken_Lantern };
+    public enum ObjectsID
+    {
+        /// <summary>
+        /// Оно же валюта
+        /// </summary>
+        Stoneberry,
+
+        /// <summary>
+        /// "Лечилка"
+        /// </summary>
+        Green_Potion,
+
+        /// <summary>
+        /// Мана
+        /// </summary>
+        Blue_Potion,
+
+        /// <summary>
+        /// Кристалл. Можно ипользовать как аккумулятор
+        /// </summary>
+        Crystal,
+
+        /// <summary>
+        /// Фонарик
+        /// </summary>
+        Lantern,
+
+        /// <summary>
+        /// Сломанный фонарик. При попытке активировать, взрывается
+        /// </summary>
+        Broken_Lantern,
+
+        /// <summary>
+        /// Бумажний фонарик. Хорошо горит :)
+        /// </summary>
+        Paper_Lantern
+    };
 
     /// <summary>
     /// Special in-game objects
     /// </summary>
-    public enum SpecialObjectsID { Shadow_Hunter_Mask, Shadow_Spider_Mask, Shadow_Bull_Mask, Shadow_Boss_Mask };
+    public enum SpecialObjectsID
+    {
+        Shadow_Hunter_Mask,
+        Shadow_Spider_Mask,
+        Shadow_Horner_Mask,
+        Shadow_Boss_Mask
+    };
 }

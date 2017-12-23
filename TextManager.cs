@@ -10,12 +10,12 @@ namespace DreamCatcher
 {
     public class TextManager : DrawableGameComponent
     {
-        SpriteFont arial;
-        SpriteFont curlz;
-        SpriteFont chiller;
-        SpriteFont sans;
-        SpriteFont papyrus;
-        SpriteFont gigi;
+        SpriteFont arial16;
+        SpriteFont curlz24;
+        SpriteFont chiller16;
+        SpriteFont sans16;
+        SpriteFont papyrus16;
+        SpriteFont gigi16;
 
         Texture2D textFrame;
         SpriteBatch spriteBatch;
@@ -33,13 +33,13 @@ namespace DreamCatcher
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
-            arial = MainClass.Load<SpriteFont>(@"Fonts\Arial");
-            curlz = MainClass.Load<SpriteFont>(@"Fonts\Curlz");
-            papyrus = MainClass.Load<SpriteFont>(@"Fonts\Papyrus");
-            sans = MainClass.Load<SpriteFont>(@"Fonts\ComicSans");
-            chiller = MainClass.Load<SpriteFont>(@"Fonts\Chiller");
-            gigi = MainClass.Load<SpriteFont>(@"Fonts\Gigi");
-            textFrame = MainClass.Load<Texture2D>(@"Images\Frame");
+            arial16 = Info.Load<SpriteFont>(@"Fonts\Arial16");
+            curlz24 = Info.Load<SpriteFont>(@"Fonts\Curlz24");
+            papyrus16 = Info.Load<SpriteFont>(@"Fonts\Papyrus16");
+            sans16 = Info.Load<SpriteFont>(@"Fonts\ComicSans16");
+            chiller16 = Info.Load<SpriteFont>(@"Fonts\Chiller16");
+            gigi16 = Info.Load<SpriteFont>(@"Fonts\Gigi16");
+            textFrame = Info.Load<Texture2D>(@"Images\Frame");
         }
 
         protected override void UnloadContent()
@@ -53,16 +53,19 @@ namespace DreamCatcher
             switch (font)
             {
                 case Fonts.Arial:
-                    spriteBatch.DrawString(arial, text, position, color);
+                    spriteBatch.DrawString(arial16, text, position, color);
+                    break;
+                case Fonts.Chiller:
+                    spriteBatch.DrawString(chiller16, text, position, color);
                     break;
                 case Fonts.CurlzMT:
-                    spriteBatch.DrawString(curlz, text, position, color);
+                    spriteBatch.DrawString(curlz24, text, position, color);
                     break;
                 case Fonts.Papyrus:
-                    spriteBatch.DrawString(papyrus, text, position, color);
+                    spriteBatch.DrawString(papyrus16, text, position, color);
                     break;
                 case Fonts.Sans:
-                    spriteBatch.DrawString(sans, text, position, color);
+                    spriteBatch.DrawString(sans16, text, position, color);
                     break;
             }
             spriteBatch.End();
@@ -71,20 +74,23 @@ namespace DreamCatcher
         public void DialogDraw(GameTime gameTime, Fonts font, string text, Color color)
         {
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
-            spriteBatch.Draw(textFrame, new Rectangle(80, 380, 800, 160), Color.White);
+            spriteBatch.Draw(textFrame, new Rectangle(70, 400, 640, 160), Color.White);
             switch (font)
             {
                 case Fonts.Arial:
-                    spriteBatch.DrawString(arial, text, new Vector2(142, 424), color);
+                    spriteBatch.DrawString(arial16, text, new Vector2(142, 444), color);
+                    break;
+                case Fonts.Chiller:
+                    spriteBatch.DrawString(chiller16, text, new Vector2(142, 444), color);
                     break;
                 case Fonts.CurlzMT:
-                    spriteBatch.DrawString(curlz, text, new Vector2(142, 424), color);
+                    spriteBatch.DrawString(curlz24, text, new Vector2(142, 444), color);
                     break;
                 case Fonts.Papyrus:
-                    spriteBatch.DrawString(papyrus, text, new Vector2(142, 424), color);
+                    spriteBatch.DrawString(papyrus16, text, new Vector2(142, 444), color);
                     break;
                 case Fonts.Sans:
-                    spriteBatch.DrawString(sans, text, new Vector2(142, 424), color);
+                    spriteBatch.DrawString(sans16, text, new Vector2(142, 444), color);
                     break;
             }
             spriteBatch.End();

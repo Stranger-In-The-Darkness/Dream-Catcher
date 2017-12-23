@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
@@ -133,27 +134,30 @@ namespace DreamCatcher
         {
             // TODO: Add your initialization logic here
 
-            MainClass.Game = this;
+            Info.Game = this;
 
-            player = new Player(
+            Player = new Player(
                 Content.Load<Texture2D>(@"Images\Player\OwlAnimation"),
                 new Vector2(0, 739), new Point(101, 130), 10,
                 new Point(0, 0), new Point(8, 6),
-                new Vector2(1.6f, 0), 70, new Rectangle(20, 0, 60, 130));
+                new Vector2(1.5f, 0), 60, new Rectangle(20, 0, 60, 130));
 
             #region Managers
-            symbolManager = new SymbolManager(
-                this,
-                new Rectangle(
-                    (int)playButtonPosition.X, 
-                    (int)playButtonPosition.Y, 
-                    (int)quitButtonPosition.X + quitButtonFrameSize.X, 
-                    (int)quitButtonPosition.Y + quitButtonFrameSize.Y));
-            levelManager = new LevelManager(this, player);
-            textManager = new TextManager(this);
+            symbolManager = 
+                new SymbolManager(
+                    this,
+                    new Rectangle(
+                        (int)playButtonPosition.X, 
+                        (int)playButtonPosition.Y, 
+                        (int)quitButtonPosition.X + quitButtonFrameSize.X, 
+                        (int)quitButtonPosition.Y + quitButtonFrameSize.Y
+                    )
+                    );
+            levelManager = new LevelManager(this, Player);
+            TextManager = new TextManager(this);
 
             Components.Add(symbolManager);
-            Components.Add(textManager);
+            Components.Add(TextManager);
             base.Initialize();
             #endregion
 
@@ -169,8 +173,10 @@ namespace DreamCatcher
 
             loading = new GameScreen(
                 ScreenType.Static, 
-                new Texture2D[] {
-                    Content.Load<Texture2D>(@"Images\Screens\LoadingScreen") }, 
+                new Texture2D[] 
+                {
+                    Content.Load<Texture2D>(@"Images\Screens\LoadingScreen")
+                }, 
                 new Vector2(700, 500), 
                 new Point(6, 0), 
                 new Point(300, 300), 
@@ -179,7 +185,10 @@ namespace DreamCatcher
 
             gameOver = new GameScreen(
                 ScreenType.Static, 
-                new Texture2D[] { Content.Load<Texture2D>(@"Images\Screens\GameOverScreen") }, 
+                new List<Texture2D> () 
+                {
+                    Content.Load<Texture2D>(@"Images\Screens\GameOverScreen")
+                }, 
                 new Point(640, 480), 
                 new Point(2, 0), 
                 new Point(4, 2), 0, 100);
@@ -233,7 +242,7 @@ namespace DreamCatcher
             spriteBatch.Dispose();
             symbolManager.Dispose();
             levelManager.Dispose();
-            textManager.Dispose();
+            TextManager.Dispose();
 
             Pointer.Dispose();
 
@@ -242,6 +251,8 @@ namespace DreamCatcher
             exitButton.Dispose();
             applyButton.Dispose();
             quitButton.Dispose();
+
+            levelManager.Dispose();
         }
 
         /// <summary>
@@ -755,7 +766,7 @@ namespace DreamCatcher
                 #region Help
                 case GameState.Help:
                     GraphicsDevice.Clear(Color.Black);
-                    textManager.Draw(gameTime, Fonts.CurlzMT, "[A], [D] - to move\n[W] - to jump\n[I] - to open inventory\n[Q] - to attack\n[E] - to act\n\nPress any key, to continue...", new Vector2(120, 60), Color.White);
+                    TextManager.Draw(gameTime, Fonts.CurlzMT, "[A], [D] - to move\n[W] - to jump\n[I] - to open inventory\n[Q] - to attack\n[E] - to act\n\nPress any key, to continue...", new Vector2(120, 60), Color.White);
                     break;
                 #endregion
                 #region Options
@@ -795,7 +806,7 @@ namespace DreamCatcher
                     {
                         GraphicsDevice.Clear(Color.Black);
                         gameOver.Draw(spriteBatch, gameTime);
-                        textManager.Draw(gameTime, Fonts.CurlzMT, "Press [Enter]...", new Vector2(80, 420), new Color(152, 255, 71));
+                        TextManager.Draw(gameTime, Fonts.CurlzMT, "Press [Enter]...", new Vector2(80, 420), new Color(152, 255, 71));
 
                         break;
                     }
@@ -805,7 +816,7 @@ namespace DreamCatcher
                     {
                         GraphicsDevice.Clear(Color.Black);
                         loading.Draw(spriteBatch, gameTime, 0.25f);
-                        textManager.Draw(gameTime, Fonts.CurlzMT, "Loading...", new Vector2(20, 420), new Color(152, 255, 71));
+                        TextManager.Draw(gameTime, Fonts.CurlzMT, "Loading...", new Vector2(20, 420), new Color(152, 255, 71));
                     }
                     break;
                     #endregion
@@ -826,10 +837,10 @@ namespace DreamCatcher
         }
 
         //Buttons click events list
-        #region ButtonsClickMethods
+        #region Buttons Click Methods
         private void PlayButtonIsClicked()
         {
-            if (MainClass.helpEnabled)
+            if (Info.helpEnabled)
             {
                 state = GameState.Help;
             }
@@ -910,5 +921,18 @@ namespace DreamCatcher
                 } 
             }
         }
+
+        public TextManager TextManager
+        {
+            get
+            {
+                if (textManager != null)
+                    return textManager;
+                else throw new NullReferenceException();
+            }
+            private set => this.textManager = value;
+        }
+
+        public Player Player { get => player; private set => player = value; }
     }
 }

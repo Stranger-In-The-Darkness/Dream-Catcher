@@ -10,40 +10,77 @@ function Map:new(groundStart,
 				 lanternsBlock, 
 				 lanternsCoordinates)
 
-self.__index = self
-local map = {}
-setmetatable(map, Map)
+	self.__index = self
+	local map = {}
+	setmetatable(map, Map)
 
-map.ground = { start = {x = groundStart[1],
-							   y = groundStart[2]},
-			   block = {x = groundBlock[1],
-							   y = groundBlock[2]}
-			  }
+map.ground = 
+	{ 
+		start = 
+			{
+				x = groundStart[1], 
+				y = groundStart[2]
+			}, 
+		block = 
+			{
+				x = groundBlock[1], 
+				y = groundBlock[2]
+			}
+	}
+
 for i,v in ipairs(groundCoordinates) 
 	do map.ground.coordinates.i = groundCoordinates[v] 
 end
-map.ground.rectangle = { x = groundRectangle[1],
-						 y = groundRectangle[2],
-						 width = groundRectangle[3],
-						 heigth = groundRectangle[4]}
 
-map.platform = { start = { x = platformsStart[1],
-						   y = platformsStart[2]},
-				 block = { x = platformsBlock[1],
-						   y = platformsBlock[2]}
-			    }
+map.ground.rectangle = 
+	{ 
+		x = groundRectangle[1],
+		y = groundRectangle[2],
+		width = groundRectangle[3],
+		heigth = groundRectangle[4]
+	}
+
+map.platform = 
+	{ 
+		start = 
+			{ 
+				x = platformsStart[1],
+				y = platformsStart[2]
+			},
+		block = 
+			{ 
+				x = platformsBlock[1],
+				y = platformsBlock[2]
+			}
+	}
+
 for i,v in ipairs(platformCoordinates) 
-	do map.platform.coordinates.i = { texture = platformCoordinates[v][1],
-								  coordinates = { x = platformCoordinates[v][2],
-												  y = platformCoordinates[v][3]},
-								  materiality = platformCoordinates[v][4]} 
+	do map.platform.coordinates.i = 
+		{ 
+			texture = platformCoordinates[v][1],
+			coordinates = 
+				{ 
+					x = platformCoordinates[v][2],
+					y = platformCoordinates[v][3]
+				},
+			materiality = platformCoordinates[v][4]
+		} 
 end
 
-map.lantern = { start = { x = lanternsStart[1],
-						  y = lanternsStart[2]}
-				block = { x = lanternsBlock[1],
-						  y = lanternsBlock[2]}
-				}
+map.lantern = 
+	{ 
+		start = 
+			{ 
+				x = lanternsStart[1],
+				y = lanternsStart[2]
+			}
+		block = 
+			{ 
+				x = lanternsBlock[1],
+				y = lanternsBlock[2]
+			}
+	}
+
 for i,v in ipairs(lanternsCoordinates) 
 	do map.lantern.coordinates.i = lanternsCoordinates[v] 
 end

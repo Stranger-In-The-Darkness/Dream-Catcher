@@ -81,7 +81,7 @@ namespace DreamCatcher
                             bool firstRun = bool.Parse(s);
                             if (!firstRun)
                             {
-                                MainClass.firstRun = false;
+                                Info.firstRun = false;
                             }
                         }
                         #endregion
@@ -99,29 +99,29 @@ namespace DreamCatcher
                                         switch (s2)
                                         {
                                             case "Forest":
-                                                MainClass.region = Region.Forest;
+                                                Info.region = Region.Forest;
                                                 break;
                                             case "City":
-                                                MainClass.region = Region.City;
+                                                Info.region = Region.City;
                                                 break;
                                             case "Cave":
-                                                MainClass.region = Region.Cave;
+                                                Info.region = Region.Cave;
                                                 break;
                                             case "Ruins":
-                                                MainClass.region = Region.Ruins;
+                                                Info.region = Region.Ruins;
                                                 break;
                                         }
                                         break;
                                     case 1:
-                                        if (!int.TryParse(s2, out MainClass.level))
+                                        if (!int.TryParse(s2, out Info.level))
                                         {
-                                            MainClass.level = 0;
+                                            Info.level = 0;
                                         }
                                         break;
                                     case 2:
-                                        if (!int.TryParse(s2, out MainClass.money))
+                                        if (!int.TryParse(s2, out Info.money))
                                         {
-                                            MainClass.money = 0;
+                                            Info.money = 0;
                                         }
                                         break;
                                     case 3:
@@ -148,13 +148,13 @@ namespace DreamCatcher
                     case 2:
                         {
                             string s2 = s.Replace("[", "").Replace("]", "");
-                            if (!int.TryParse(s2.Split(';')[0], out MainClass.succedCount))
+                            if (!int.TryParse(s2.Split(';')[0], out Info.succedCount))
                             {
-                                MainClass.succedCount = 0;
+                                Info.succedCount = 0;
                             }
                             for (int i2 = 0; i2 < s2.Split(';')[1].Split(',').Length; i2++)
                             {
-                                //Логика для секреток. Предположительно... MainClass: bool <ID> = value;
+                                //Логика для секреток. Предположительно... Info: bool <ID> = value;
                             }
                         }
                         #endregion
@@ -179,7 +179,7 @@ namespace DreamCatcher
             }
             else
             {
-                settingsSave.WriteLine(MainClass.MusicLevel.ToString());
+                settingsSave.WriteLine(Info.MusicLevel.ToString());
             }
 
             if (SFXVolume != -1)
@@ -192,7 +192,7 @@ namespace DreamCatcher
             }
             else
             {
-                settingsSave.WriteLine(MainClass.SFXLevel.ToString());
+                settingsSave.WriteLine(Info.SFXLevel.ToString());
             }
 
             if (helpEnabled)
@@ -212,9 +212,9 @@ namespace DreamCatcher
         {
             settingsRead = new StreamReader(File.Open("settings.dcset", FileMode.OpenOrCreate, FileAccess.ReadWrite));
             string[] settings = settingsRead.ReadToEnd().Split('/');
-            MainClass.SFXLevel = float.Parse(settings[0]);
-            MainClass.MusicLevel = float.Parse(settings[1]);
-            MainClass.helpEnabled = bool.Parse(settings[2]);
+            Info.SFXLevel = float.Parse(settings[0]);
+            Info.MusicLevel = float.Parse(settings[1]);
+            Info.helpEnabled = bool.Parse(settings[2]);
 
             settingsRead.Dispose();
             settingsRead.Close();
@@ -224,9 +224,9 @@ namespace DreamCatcher
         {
             settingsRead = new StreamReader(File.Open(path, FileMode.Open, FileAccess.Read));
             string[] settings = settingsRead.ReadToEnd().Split('/');
-            MainClass.SFXLevel = float.Parse(settings[0]);
-            MainClass.MusicLevel = float.Parse(settings[1]);
-            MainClass.helpEnabled = bool.Parse(settings[2]);
+            Info.SFXLevel = float.Parse(settings[0]);
+            Info.MusicLevel = float.Parse(settings[1]);
+            Info.helpEnabled = bool.Parse(settings[2]);
 
             settingsRead.Dispose();
             settingsRead.Close();

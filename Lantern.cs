@@ -20,6 +20,8 @@ namespace DreamCatcher
         bool isActive = false; //Работает фонарик, или нет
         bool activation = false; //Переменная отвечает за "включение/выключение" фонариков
         int health = 3;
+
+        bool intersectsWithPlayer = false;
         #endregion
 
         #region Constructors
@@ -84,6 +86,20 @@ namespace DreamCatcher
         {
             try
             {
+                if (intersectsWithPlayer)
+                {
+                    Info.Game.TextManager.Draw(
+                        new GameTime(), 
+                        Fonts.Chiller, 
+                        "Press [E]", 
+                        new Vector2
+                        (
+                            Info.Game.Player.CollisionRect.Left - 10 - drawFramePosition.X, 
+                            Info.Game.Player.CollisionRect.Top - 50 - drawFramePosition.Y
+                        ), 
+                        Color.White * 0.25f);
+                    intersectsWithPlayer = false;
+                }
                 spriteBatch.Draw(spriteSheet, new Vector2(position.X - drawFramePosition.X, position.Y - drawFramePosition.Y), new Rectangle((currentFrame.X * frameSize.X),
                     (currentFrame.Y * frameSize.Y), frameSize.X,
                     frameSize.Y), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
@@ -91,6 +107,21 @@ namespace DreamCatcher
             catch
             {
                 spriteBatch.Begin();
+                if (intersectsWithPlayer)
+                {
+                    Info.Game.TextManager.Draw(
+                        new GameTime(),
+                        Fonts.Chiller,
+                        "Press [E]",
+                        new Vector2
+                        (
+                            Info.Game.Player.CollisionRect.Left + 5 - drawFramePosition.X,
+                            Info.Game.Player.CollisionRect.Top - 50 - drawFramePosition.Y
+                        ),
+                        Color.White * 0.25f);
+                    intersectsWithPlayer = false;
+                }
+
                 spriteBatch.Draw(spriteSheet, new Vector2(position.X - drawFramePosition.X, position.Y - drawFramePosition.Y), new Rectangle((currentFrame.X * frameSize.X),
                     (currentFrame.Y * frameSize.Y), frameSize.X,
                     frameSize.Y), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
@@ -106,35 +137,15 @@ namespace DreamCatcher
             lanternList.Clear();
         }
 
-        public void Activate()
-        {
-            if (!Active)
-            {
-                Active = true;
-                activation = true;
-            }
-        }
-
-        public bool Attack()
+        private bool Attack()
         {
             if (health > 0)
             {
                 health--;
                 return false;
             }
-            currentFrame.X = 0;
-            currentFrame.Y = 0;
             isActive = false;
             return true;
-        }
-
-        public void Charge()
-        {
-            health++;
-            if (health > 3)
-            {
-                health = 3;
-            }
         }
 
         public override string ToString()
@@ -143,13 +154,52 @@ namespace DreamCatcher
             return s;
         }
 
-        public bool CollisionCheck (Rectangle rectangle)
+        public bool CollisionCheck (object o)
         {
-            if (CollisionRect.Intersects(rectangle))
+            if (o is Rectangle rectangle)
             {
-                return true;
+                if (CollisionRect.Intersects(rectangle))
+                {
+                    return true;
+                }
+            }
+            else if(o is Player p)
+            {            
+                if (this.CollisionRect.Intersects(p.CollisionRect))
+                {
+                    if (!Active)
+                    {
+                        intersectsWithPlayer = true;
+                    }
+                    return true;
+                }
+                intersectsWithPlayer = false;
+                return false;
             }
             return false;
+        }
+
+        public void Interact(object sender)
+        {
+            if(sender is Player)
+            {
+                if (!Active)
+                {
+                    Active = true;
+                    activation = true;
+                }
+            }
+            else if(sender is Enemy)
+            {
+                Attack();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!this.iconSprite.IsDisposed) this.iconSprite.Dispose();
+            if (!this.spriteSheet.IsDisposed) this.spriteSheet.Dispose();
+            base.Dispose();
         }
         #endregion
 

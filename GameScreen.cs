@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 
-namespace DreamCatcher
+namespace DreamCatcher 
 {
     //Первый - задний фон движется относительно движения персонажа
     //Второй - остаётся на месте. Пример - "Конец Игры"
@@ -20,28 +20,49 @@ namespace DreamCatcher
     class GameScreenSpecial
     {
         #region Variables
-        public Texture2D screen;
-        public Vector2 position;
-        public Point frameSize;
-        public float opacity = 0;
-        public Point secretPoint;
-        public int pointOffset;
+        private Texture2D screen;
+        private Vector2 position;
+        private Point frameSize;
+        private float opacity = 0;
+        private Point secretPoint;
+        private int pointOffset;
+
+        private bool disposed = false;
+
+        public Texture2D Screen { get => screen; set => screen = value; }
+        public Vector2 Position { get => position; set => position = value; }
+        public Point FrameSize { get => frameSize; set => frameSize = value; }
+        public float Opacity { get => opacity; set => opacity = value; }
+        public Point SecretPoint { get => secretPoint; set => secretPoint = value; }
+        public int PointOffset { get => pointOffset; set => pointOffset = value; }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                if(!screen.IsDisposed) screen.Dispose();
+            }
+        }
         #endregion
     }
 
     /// <summary>
     /// Contains texture and draw rectangle
     /// </summary>
-    struct ScreenPart
+    class ScreenPart
     {
-        Texture2D texture;
-        Vector2 position;
-        Rectangle view;
+        private Texture2D texture;
+        private Vector2 position;
+        private Rectangle view;
+
+        private bool disposed;
+
         public ScreenPart (Texture2D texture, Rectangle view, Vector2 position)
         {
             this.texture = texture;
             this.position = position;
             this.view = view;
+            this.disposed = false;
         }
 
         public Texture2D @Texture
@@ -71,6 +92,14 @@ namespace DreamCatcher
             get
             {
                 return position;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                if(!texture.IsDisposed) texture.Dispose();
             }
         }
     }
@@ -120,12 +149,12 @@ namespace DreamCatcher
         /// <param name="sheetSize">Sheet size of animation [in frames]</param>
         /// <param name="timeSinceLastFrame">Time since last animation frame</param>
         /// <param name="millisecondsPerFrame">Milliseconds per animation frames</param>
-        public GameScreen(ScreenType type, Texture2D[] screen, Point frameSize, Point currentFrame,
+        public GameScreen(ScreenType type, List<Texture2D> screen, Point frameSize, Point currentFrame,
             Point sheetSize, int timeSinceLastFrame, int millisecondsPerFrame)
         {
             this.type = type;
-            this.screen = new ScreenPart[screen.Length];
-            for (int i = 0; i<screen.Length; i++)
+            this.screen = new ScreenPart[screen.Count];
+            for (int i = 0; i<screen.Count; i++)
             {
                 this.screen[i] = new ScreenPart(screen[i], new Rectangle(0, screen[i].Height - 600, 800, 600), new Vector2(80, 60));
             }
@@ -218,23 +247,23 @@ namespace DreamCatcher
                         for (int i = 0; i< screenSpecialsList.Count; i++)
                         {
                                 GameScreenSpecial special = screenSpecialsList[i];
-                            if (Math.Abs(mouseState.X - special.secretPoint.X) <= special.pointOffset && Math.Abs(mouseState.Y - special.secretPoint.Y) <= special.pointOffset)
+                            if (Math.Abs(mouseState.X - special.SecretPoint.X) <= special.PointOffset && Math.Abs(mouseState.Y - special.SecretPoint.Y) <= special.PointOffset)
                             {
-                                if (Math.Sqrt(Math.Pow(mouseState.X - special.secretPoint.X, 2) + Math.Pow(mouseState.Y - special.secretPoint.Y, 2)) < Math.Sqrt(Math.Pow(prevMouseState.X - special.secretPoint.X, 2) + Math.Pow(prevMouseState.Y - special.secretPoint.Y, 2)))
+                                if (Math.Sqrt(Math.Pow(mouseState.X - special.SecretPoint.X, 2) + Math.Pow(mouseState.Y - special.SecretPoint.Y, 2)) < Math.Sqrt(Math.Pow(prevMouseState.X - special.SecretPoint.X, 2) + Math.Pow(prevMouseState.Y - special.SecretPoint.Y, 2)))
                                 {
-                                    special.opacity += 0.05f;
-                                    if (special.opacity > 1.0f)
+                                    special.Opacity += 0.05f;
+                                    if (special.Opacity > 1.0f)
                                     {
-                                        special.opacity = 1.0f;
+                                        special.Opacity = 1.0f;
                                     }
                                 }
 
-                                else if (Math.Sqrt(Math.Pow(mouseState.X - special.secretPoint.X, 2) + Math.Pow(mouseState.Y - special.secretPoint.Y, 2)) > Math.Sqrt(Math.Pow(prevMouseState.X - special.secretPoint.X, 2) + Math.Pow(prevMouseState.Y - special.secretPoint.Y, 2)))
+                                else if (Math.Sqrt(Math.Pow(mouseState.X - special.SecretPoint.X, 2) + Math.Pow(mouseState.Y - special.SecretPoint.Y, 2)) > Math.Sqrt(Math.Pow(prevMouseState.X - special.SecretPoint.X, 2) + Math.Pow(prevMouseState.Y - special.SecretPoint.Y, 2)))
                                 {
-                                    special.opacity -= 0.05f;
-                                    if (special.opacity < 0.0f)
+                                    special.Opacity -= 0.05f;
+                                    if (special.Opacity < 0.0f)
                                     {
-                                        special.opacity = 0.0f;
+                                        special.Opacity = 0.0f;
                                     }
                                 }
                                 else
@@ -242,10 +271,10 @@ namespace DreamCatcher
                                     milliseconds += gameTime.ElapsedGameTime.Milliseconds;
                                     if (milliseconds >= millisecondsTillInvisible)
                                     {
-                                        special.opacity -= 0.05f;
-                                        if (special.opacity < 0.0f)
+                                        special.Opacity -= 0.05f;
+                                        if (special.Opacity < 0.0f)
                                         {
-                                            special.opacity = 0.0f;
+                                            special.Opacity = 0.0f;
                                             milliseconds = 0;
                                         }
                                     }
@@ -253,10 +282,10 @@ namespace DreamCatcher
                             }
                             else
                             {
-                                special.opacity -= 0.05f;
-                                if (special.opacity < 0.0f)
+                                special.Opacity -= 0.05f;
+                                if (special.Opacity < 0.0f)
                                 {
-                                    special.opacity = 0.0f;
+                                    special.Opacity = 0.0f;
                                     milliseconds = 0;
                                 }
                             }
@@ -316,7 +345,7 @@ namespace DreamCatcher
                         }
                         foreach (GameScreenSpecial spec in screenSpecialsList)
                         {
-                            spriteBatch.Draw(spec.screen, spec.position, Color.White * spec.opacity);
+                            spriteBatch.Draw(spec.Screen, spec.Position, Color.White * spec.Opacity);
                         }
                     break;
                 #endregion
@@ -356,7 +385,7 @@ namespace DreamCatcher
                         }
                     foreach (GameScreenSpecial spec in screenSpecialsList)
                     {
-                        spriteBatch.Draw(spec.screen, spec.position, Color.White * spec.opacity);
+                        spriteBatch.Draw(spec.Screen, spec.Position, Color.White * spec.Opacity);
                     }
                     break;
                 #endregion
@@ -397,7 +426,7 @@ namespace DreamCatcher
                         }
                     foreach (GameScreenSpecial spec in screenSpecialsList)
                     {
-                        spriteBatch.Draw(spec.screen, spec.position, Color.White * spec.opacity);
+                        spriteBatch.Draw(spec.Screen, spec.Position, Color.White * spec.Opacity);
                     }
                     break;
                 #endregion
@@ -414,6 +443,26 @@ namespace DreamCatcher
                         }
                     break;
                     #endregion
+            }
+        }
+
+        public void Dispose()
+        {
+            if(screen.Length != 0)
+            {
+                foreach(ScreenPart sp in screen)
+                {
+                    sp.Dispose();
+                }
+                screen = null;
+            }
+            if (screenSpecialsList.Count != 0)
+            {
+                foreach(GameScreenSpecial gsp in screenSpecialsList)
+                {
+                    gsp.Dispose();
+                }
+                screenSpecialsList.Clear();
             }
         }
 
@@ -445,12 +494,12 @@ namespace DreamCatcher
         public void AddSpecial(Texture2D screen, Vector2 position, Point frameSize, Point secretPoint, int offset)
         {
             GameScreenSpecial gSS = new GameScreenSpecial();
-            gSS.screen = screen;
-            gSS.position = position;
-            gSS.frameSize = frameSize;
-            gSS.secretPoint = secretPoint;
-            gSS.pointOffset = offset;
-            gSS.opacity = 0.0f;
+            gSS.Screen = screen;
+            gSS.Position = position;
+            gSS.FrameSize = frameSize;
+            gSS.SecretPoint = secretPoint;
+            gSS.PointOffset = offset;
+            gSS.Opacity = 0.0f;
             screenSpecialsList.Add(gSS);
         }
         #endregion

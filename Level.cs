@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DreamCatcher
 {
@@ -37,15 +38,20 @@ namespace DreamCatcher
             switch (ID)
             {
                 case ObstaclesID.Leaf_Pile:
-                    texture = MainClass.Load<Texture2D>("");
+                    texture = Info.Load<Texture2D>("");
                     break;
                 case ObstaclesID.Rock_Pile:
                 case ObstaclesID.Stump:
                 case ObstaclesID.Bush:
                 case ObstaclesID.Tree:
-                    texture = MainClass.Load<Texture2D>("");
+                    texture = Info.Load<Texture2D>("");
                     break;
             }
+        }
+
+        public void Dispose()
+        {
+            if (!this.texture.IsDisposed) this.texture.Dispose();
         }
     }
 
@@ -81,12 +87,12 @@ namespace DreamCatcher
         //Все варианты платформ
         List<Texture2D> platformTextureList = new List<Texture2D>
         {
-            MainClass.Load<Texture2D>(@"Images\Platforms\PlatformSpriteSheetRE"),
-            MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet1V3"),
-            MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet2V3"),
-            MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet3"),
-            MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet4V3"),
-            MainClass.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet5V3")
+            Info.Load<Texture2D>(@"Images\Platforms\PlatformSpriteSheetRE"),
+            Info.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet1RE"),
+            Info.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet2RE"),
+            Info.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet3RE"),
+            Info.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet4RE"),
+            Info.Load<Texture2D>(@"Images\Platforms\SymbolPlatforms\SymbolPlatformSpriteSheet5RE")
         };
 
         //Список платформ
@@ -151,36 +157,37 @@ namespace DreamCatcher
             inputManager.Update();
             //background.Update(gameTime, player.Direction);
 
-            #region Player_Logic
+            #region Player Logic
             player.Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y - background.FrameSize.Y % 10));
             player.CollisionCheck((from pl in platformsList
                                    from p in pl
                                    select p).ToList());
             #endregion
 
-            #region Enemies_Logic
+            #region Enemies Logic
+
             if (Enemy.GetEnemies.Count != 0) for (int i = 0; i < Enemy.GetEnemies.Count; i++)
                 {
                     List<Lantern> l = (from lan in Lantern.GetLanterns
-                                       where lan.Active == true
+                                       where lan.Active
                                        select lan).ToList();
                     List<Platform> p = (from plat in platformsList
                                         from pl in plat
-                                        where pl.IsMaterial == true
+                                        where pl.IsMaterial
                                         select pl).ToList();
+
                     Enemy.GetEnemies[i].Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y), p, l);
-                    if (player.CollisionRect.Intersects(Enemy.GetEnemies[i].CollisionRect)) player.Respawn();
-                }
+                    }
             #endregion
 
-            #region Lanterns_Logic
+            #region Lanterns Logic
             if (Lantern.GetLanterns.Count != 0) for (int i = 0; i < Lantern.GetLanterns.Count; i++)
                 {
                     Lantern.GetLanterns[i].Update(gameTime, new Rectangle(0, 0, background.FrameSize.X, background.FrameSize.Y));
                 }
             #endregion
 
-            #region Collision_Logic
+            #region Collision Logic
             #region Platforms
             for (int i = 0; i<platformsList.Count; i++)
             {
@@ -226,14 +233,18 @@ namespace DreamCatcher
                 {
                     player.CollisionCheck(obstacles[i].collisionRectangle);
                 }
-            if (Lantern.GetLanterns.Count != 0) for (int i = 0; i< Lantern.GetLanterns.Count; i++)
+            #endregion
+            #region Lantern
+            if (Lantern.GetLanterns.Count != 0)
+                for (int i = 0; i< Lantern.GetLanterns.Count; i++)
                 {
-                    if (Lantern.GetLanterns[i].CollisionCheck(player.CollisionRect)) Lantern.GetLanterns[i].Activate();
+                    //Lantern.GetLanterns[i].CollisionCheck(player);
+                    player.CollisionCheck(Lantern.GetLanterns[i]);
                 }
             #endregion
             #endregion
 
-            #region Win_Logic
+            #region Win Logic
             bool win = true;
             for (int i = 0; i < Lantern.GetLanterns.Count; i++)
             {
@@ -246,11 +257,8 @@ namespace DreamCatcher
             if (region!= Region.Dream && Enemy.GetEnemies.Count != 0) win = false;
             if (win)
             {
-                while(Enemy.GetEnemies.Count != 0)
-                {
-                    Enemy.GetEnemies.RemoveAt(0);
-                }
-                //MainClass.Win();
+                Enemy.Clear();
+                //Info.Win();
             }
             #endregion
         }
@@ -337,6 +345,55 @@ namespace DreamCatcher
             }
         }
 
+        public void Dispose()
+        {
+            this.background.Dispose();
+            if (this.foreground.Count != 0)
+            {
+                foreach (Texture2D t in foreground)
+                {
+                    if (t.IsDisposed)
+                    {
+                        continue;
+                    }
+                    t.Dispose();
+                }
+                foreground = null;
+            }
+            if (!this.lantern.IsDisposed) this.lantern.Dispose();
+            if (this.objects.Count != 0)
+            {
+                foreach (Object o in objects)
+                {
+                    o.Dispose();
+                }
+                objects = null;
+            }
+            if (this.obstacles.Count != 0)
+            {
+                foreach(Obstacle o in obstacles)
+                {
+                    o.Dispose();
+                }
+                obstacles = null;
+            }
+
+            if(this.platformTextureList.Count != 0)
+            {
+                foreach(Texture2D t in platformTextureList)
+                {
+                    if (t.IsDisposed) continue;
+                    t.Dispose();
+                }
+                platformTextureList = null;
+            }
+
+            if (this.platformsList.Count != 0)
+            {
+                platformsList.ForEach((p) => { foreach (Platform pl in p) { pl.Dispose(); } });
+                platformsList = null;
+            }
+        }
         /// <summary>
         /// Loads game components, such as platforms and lanterns
         /// </summary>

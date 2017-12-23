@@ -13,7 +13,7 @@ using NLua;
 
 namespace DreamCatcher
 {
-    static class MainClass
+    static class Info
     {
         #region Variabes
         public static Point currentFrameSize = new Point(800, 600);
@@ -148,6 +148,7 @@ namespace DreamCatcher
                 System.IO.StreamWriter log = new System.IO.StreamWriter("dcg.log", true);
                 log.WriteLineAsync(s);
                 log.Close();
+                log.Dispose();
             }
         }
         #endregion

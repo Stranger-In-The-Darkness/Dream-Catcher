@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Design;
 
 namespace DreamCatcher
 {
-    public abstract class Sprite
+    public abstract class Sprite : IDisposable
     {
         protected Texture2D textureImage;
         protected Point frameSize;
@@ -82,6 +82,11 @@ namespace DreamCatcher
             spriteBatch.Draw(textureImage, new Vector2(position.X - drawFramePosition.X, position.Y - drawFramePosition.Y), new Rectangle((currentFrame.X * frameSize.X),
                 (currentFrame.Y * frameSize.Y), frameSize.X,
                 frameSize.Y), Color.White, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+        }
+
+        public void Dispose()
+        {
+            if(!this.textureImage.IsDisposed) this.textureImage.Dispose();
         }
 
         public virtual Rectangle CollisionRect

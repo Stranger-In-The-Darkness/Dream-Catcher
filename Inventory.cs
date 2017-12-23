@@ -33,15 +33,15 @@ namespace DreamCatcher
         public Inventory()
         {
             objectList = new List<Object>(capacity);
-            //invetoryFrame = MainClass.Load<Texture2D>(@"Images\InventoryFrame");
-            //pointers = MainClass.Load<Texture2D>(@"Images\InventoryPointers");
+            //invetoryFrame = Info.Load<Texture2D>(@"Images\InventoryFrame");
+            //pointers = Info.Load<Texture2D>(@"Images\InventoryPointers");
         }
 
         public Inventory(int capacity)
         {
             objectList = new List<Object>(capacity);
-            //invetoryFrame = MainClass.Load<Texture2D>(@"Images\InventoryFrame");
-            //pointers = MainClass.Load<Texture2D>(@"Images\InventoryPointers");
+            //invetoryFrame = Info.Load<Texture2D>(@"Images\InventoryFrame");
+            //pointers = Info.Load<Texture2D>(@"Images\InventoryPointers");
         }
         #endregion
 

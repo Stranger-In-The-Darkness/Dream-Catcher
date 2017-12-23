@@ -494,49 +494,69 @@ namespace DreamCatcher
         /// Overload of method to check collision of player and ground
         /// </summary>
         /// <param name="r">Ground rectangle</param>
-        public void CollisionCheck(Rectangle r)
+        public void CollisionCheck(object o)
         {
-            isGrounded = false;
-            if (CollisionRect.Intersects(r))
+            if (o is Rectangle r)
             {
-                if (dir == Dir.Left_Down || dir == Dir.Right_Down)
+                isGrounded = false;
+                if (CollisionRect.Intersects(r))
                 {
-                    //Если игрок над платформой, то он останавливается на ней
-                    if (CollisionRect.Bottom - r.Top > 0
-                        && CollisionRect.Bottom - r.Top < 15)
+                    if (dir == Dir.Left_Down || dir == Dir.Right_Down)
                     {
-                        if (state == State.Jump)
-                        {
-                            state = State.Landed;
-                            currentFrame.X = 4;
-                            currentFrame.Y = 5;
-                        }
-                        gravityOn = false;
-                        speed.Y = 0;
-                        isGrounded = true;
-                        dir = dir == Dir.Left_Down ? Dir.Left : dir == Dir.Right_Down ? Dir.Right : dir;
-                    }
-                }
-                else if (state != State.Jump)
-                {
-                    if (!(dir == Dir.Left && (r.Right - CollisionRect.Right > 30))
-                        || !(dir == Dir.Right && (r.Left - CollisionRect.Left < -30)))
-                    {
+                        //Если игрок над платформой, то он останавливается на ней
                         if (CollisionRect.Bottom - r.Top > 0
                             && CollisionRect.Bottom - r.Top < 15)
                         {
+                            if (state == State.Jump)
+                            {
+                                state = State.Landed;
+                                currentFrame.X = 4;
+                                currentFrame.Y = 5;
+                            }
+                            gravityOn = false;
                             speed.Y = 0;
                             isGrounded = true;
-                            if (state != State.Stay && state != State.Walk)
-                            {
-                                state = State.Stay;
-                            }
+                            dir = dir == Dir.Left_Down ? Dir.Left : dir == Dir.Right_Down ? Dir.Right : dir;
                         }
                     }
-                    else
+                    else if (state != State.Jump)
                     {
-                        isGrounded = false;
+                        if (!(dir == Dir.Left && (r.Right - CollisionRect.Right > 30))
+                            || !(dir == Dir.Right && (r.Left - CollisionRect.Left < -30)))
+                        {
+                            if (CollisionRect.Bottom - r.Top > 0
+                                && CollisionRect.Bottom - r.Top < 15)
+                            {
+                                speed.Y = 0;
+                                isGrounded = true;
+                                if (state != State.Stay && state != State.Walk)
+                                {
+                                    state = State.Stay;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            isGrounded = false;
+                        }
                     }
+                }
+            }
+            else if (o is Lantern l)
+            {
+                if (l.CollisionCheck(this))
+                {
+                    if (inputManager.KeyPressed(Keys.E))
+                    {
+                        l.Interact(this);
+                    }
+                }
+            }
+            else if(o is Enemy e)
+            {
+                if (e.CollisionRect.Intersects(CollisionRect))
+                {
+                    Respawn();
                 }
             }
         }
@@ -555,7 +575,7 @@ namespace DreamCatcher
                 health -= (points - shield);
                 if (health <= 0)
                 {
-                    MainClass.GameOver();
+                    Info.GameOver();
                 }
             }
         }
@@ -577,8 +597,14 @@ namespace DreamCatcher
             lives--;
             if(lives <= 0)
             {
-                MainClass.Game.GameOver();
+                Info.Game.GameOver();
             }
+        }
+
+        public void Dispose()
+        {
+            if (!this.currentEffect.IsDisposed) this.currentEffect.Dispose();
+            if (!this.textureImage.IsDisposed) this.textureImage.Dispose();
         }
 
         #endregion
@@ -604,7 +630,7 @@ namespace DreamCatcher
                     }
                     inputDirection.X -= 1;
                     dir = Dir.Left;
-                    //currentEffect = MainClass.Load<SoundEffect>(@"SoundEffects\PlayerWalk");
+                    //currentEffect = Info.Load<SoundEffect>(@"SoundEffects\PlayerWalk");
                 }
                 else if (keyboard.IsKeyDown(Keys.Right) || keyboard.IsKeyDown(Keys.D))
                 {
@@ -616,7 +642,7 @@ namespace DreamCatcher
                     }
                     inputDirection.X += 1;
                     dir = Dir.Right;
-                    //currentEffect = MainClass.Load<SoundEffect>(@"SoundEffects\PlayerWalk");
+                    //currentEffect = Info.Load<SoundEffect>(@"SoundEffects\PlayerWalk");
                 }
                 if (gravityOn || !isGrounded)
                 {
@@ -635,7 +661,7 @@ namespace DreamCatcher
                     gravityOn = true;
                     if (dir == Dir.Left) dir = Dir.Left_Up;
                     else if (dir == Dir.Right) dir = Dir.Right_Up;
-                    //currentEffect = MainClass.Load<SoundEffect>(@"SoundEffects\PlayerJump");
+                    //currentEffect = Info.Load<SoundEffect>(@"SoundEffects\PlayerJump");
                 }
                 return inputDirection * speed;
             }

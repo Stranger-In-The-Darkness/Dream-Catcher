@@ -11,7 +11,7 @@ namespace DreamCatcher
     {
         static Nullable<Point> spawnPoint = null;
 
-#region Methods
+        #region Methods
         public static Enemy GetBasicEnemy(EnemiesID ID, Vector2 position)
         {
             return new Enemy(ID, EnemyClass.Basic, position);
@@ -33,7 +33,7 @@ namespace DreamCatcher
         }
         #endregion
 
-#region Properties
+        #region Properties
         public static Point SpawnPoint
         {
             get
@@ -48,7 +48,7 @@ namespace DreamCatcher
                 }
             }
         }
-#endregion
+        #endregion
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ namespace DreamCatcher
         int visionRadius = 180;
 
         const int delay = 2000;
-        readonly int jumpDelay = 500;
+        readonly int jumpDelay = 1000;
         int currentDelay = 0;
 
         int counter = 0; //Костыль редкостный. Считает сколько раз Тень "отбивается" от края платформы. Если > 2 - прыгаем
@@ -256,7 +256,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
         }
 
         public Enemy(EnemiesID ID, EnemyClass @class, Vector2 position)
-            :base(null, Vector2.Zero, Point.Zero, 0, Point.Zero, Point.Zero, Vector2.Zero)
+            : base(null, Vector2.Zero, Point.Zero, 0, Point.Zero, Point.Zero, Vector2.Zero)
         {
             this.ID = ID;
             eClass = @class;
@@ -269,7 +269,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                     break;
             }
             NLua.LuaTable table = (NLua.LuaTable)result[0];
-            textureImage = MainClass.Load<Texture2D>(table["texture"].ToString());
+            textureImage = Info.Load<Texture2D>(table["texture"].ToString());
             this.position = position;
 
             NLua.LuaTable tabl = (NLua.LuaTable)table["frame_size"];
@@ -371,12 +371,13 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
         {
             switch (eClass)
             {
+
                 case EnemyClass.Basic:
                     {
                         ChooseTarget(lanternList); //Выбор цели
                         if (currentTarget != null && currentTarget.CollisionRect.Intersects(CollisionRect)) //Если достиг цели - действуй
                         {
-                            currentTarget.Attack();
+                            currentTarget.Interact(this);
                             currentTarget = null;
                             jump = true;
                             downWeGo = false;
@@ -431,7 +432,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                     #endregion
 
                                     //Костыли
-                                    if (dir == Dir.Left) direction.X = -1; 
+                                    if (dir == Dir.Left) direction.X = -1;
                                     else if (dir == Dir.Right) direction.X = 1;
 
                                     #region Not_Null_Target
@@ -590,7 +591,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                         {
                                                             if (direction.X == -1)
                                                             {
-                                                                if(p.CollisionRect.X < currentPlatform.CollisionRect.X)
+                                                                if (p.CollisionRect.X < currentPlatform.CollisionRect.X)
                                                                 {
                                                                     state = State.Walk;
                                                                     break;
@@ -598,7 +599,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                             }
                                                             else if (direction.X == 1)
                                                             {
-                                                                if(p.CollisionRect.X > currentPlatform.CollisionRect.X)
+                                                                if (p.CollisionRect.X > currentPlatform.CollisionRect.X)
                                                                 {
                                                                     state = State.Walk;
                                                                     break;
@@ -613,19 +614,19 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                              && pl != currentPlatform
                                                                              && pl.CollisionRect.Y == currentPlatform.CollisionRect.Y
                                                                              select pl).ToList();
-                                                        if(p3.Count != 0)
+                                                        if (p3.Count != 0)
                                                         {
-                                                            foreach(Platform p in p3)
+                                                            foreach (Platform p in p3)
                                                             {
                                                                 if (direction.X == -1)
                                                                 {
-                                                                    if(p.CollisionRect.X < currentPlatform.CollisionRect.X)
+                                                                    if (p.CollisionRect.X < currentPlatform.CollisionRect.X)
                                                                     {
                                                                         Jump(p);
                                                                         break;
                                                                     }
                                                                 }
-                                                                else if(direction.X == 1)
+                                                                else if (direction.X == 1)
                                                                 {
                                                                     if (p.CollisionRect.X > currentPlatform.CollisionRect.X)
                                                                     {
@@ -765,8 +766,8 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                          select pl).ToList();
                                                     if (p3.Count != 0) //Если соседи есть, прыгаем к ним
                                                     {
-                                                        MainClass.WriteLog("Inline jump: " + p3.Count.ToString());
-                                                        Jump(dir == Dir.Left ? p3[p3.Count -1] : p3[0]);
+                                                        Info.WriteLog("Inline jump: " + p3.Count.ToString());
+                                                        Jump(dir == Dir.Left ? p3[p3.Count - 1] : p3[0]);
                                                         break;
                                                     }
                                                     else //Иначе опять думаем
@@ -797,9 +798,9 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                                      pl != currentPlatform &&
                                                                                      pl.CollisionRect.Y < currentPlatform.CollisionRect.Y
                                                                                      select pl).ToList();
-                                                                if(p4.Count != 0) //И если есть куда, то скатертью дорога
+                                                                if (p4.Count != 0) //И если есть куда, то скатертью дорога
                                                                 {
-                                                                    MainClass.WriteLog("Up-line jump: " + p4.Count.ToString());
+                                                                    Info.WriteLog("Up-line jump: " + p4.Count.ToString());
                                                                     Jump(dir == Dir.Left ? p4[0] : p4[p4.Count - 1]);
                                                                     break;
                                                                 }
@@ -819,9 +820,9 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                                      pl != currentPlatform &&
                                                                                      pl.CollisionRect.Y > currentPlatform.CollisionRect.Y
                                                                                      select pl).ToList();
-                                                                if(p4.Count != 0) //Если есть - пошли в гости
+                                                                if (p4.Count != 0) //Если есть - пошли в гости
                                                                 {
-                                                                    MainClass.WriteLog("Down-line jump: " + p3.Count.ToString());
+                                                                    Info.WriteLog("Down-line jump: " + p3.Count.ToString());
                                                                     Jump(dir == Dir.Left ? p4[0] : p4[p4.Count - 1]);
                                                                     break;
                                                                 }
@@ -882,7 +883,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                         if (p.Count != 0) //И есть куда топать
                                         {
                                             bool canGo = false;
-                                            for (int i = 0; i<p.Count; i++)
+                                            for (int i = 0; i < p.Count; i++)
                                             {
                                                 Platform pl = p[i];
                                                 //То проверяем, прокатит, или нет
@@ -915,6 +916,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                 }
                                             }
                                         }
+                                        p.Clear();
                                     }
                                     #endregion
 
@@ -937,7 +939,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                 else
                                                 {
                                                     direction.X = CollisionRect.X > currentTarget.CollisionRect.X ? -1 : 1;
-                                                    dir = direction.X == -1 ? Dir.Left : direction.X == 1 ? Dir.Right : dir;          
+                                                    dir = direction.X == -1 ? Dir.Left : direction.X == 1 ? Dir.Right : dir;
                                                 }
                                             }
                                             else
@@ -947,20 +949,21 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                     List<Platform> p = (from pl in platformList
                                                                         where pl.CollisionRect.Intersects(JumpRect)
                                                                         select pl).ToList();
-                                                    if(p.Count!= 0)
+                                                    if (p.Count != 0)
                                                     {
-                                                        foreach(Platform pl in p)
+                                                        foreach (Platform pl in p)
                                                         {
                                                             if (direction.X == -1 && pl.CollisionRect.X <= position.X)
                                                             {
                                                                 Jump(pl); break;
                                                             }
-                                                            else if(direction.X == 1 && pl.CollisionRect.X >= position.X)
+                                                            else if (direction.X == 1 && pl.CollisionRect.X >= position.X)
                                                             {
                                                                 Jump(pl); break;
                                                             }
                                                         }
                                                     }
+                                                    p.Clear();
                                                 }
                                                 else
                                                 {
@@ -1023,7 +1026,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                         {
                                                             if (pl.CollisionRect.X - position.X <= 0)
                                                             {
-                                                                MainClass.WriteLog("Walk");
+                                                                Info.WriteLog("Walk");
                                                                 Jump(pl);
                                                                 break;
                                                             }
@@ -1032,7 +1035,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                         {
                                                             if (pl.CollisionRect.X - position.X >= 0)
                                                             {
-                                                                MainClass.WriteLog("Walk");
+                                                                Info.WriteLog("Walk");
                                                                 Jump(pl);
                                                                 break;
                                                             }
@@ -1040,11 +1043,12 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                     }
                                                     if (jump)
                                                     {
-                                                        MainClass.WriteLog("Walk");
+                                                        Info.WriteLog("Walk");
                                                         Jump(dir == Dir.Left ? p2[0] : p2[p2.Count - 1]);
                                                         break;
                                                     }
                                                 }
+                                                p2.Clear();
                                             }
                                             #endregion
 
@@ -1061,7 +1065,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                          select pl).ToList();
                                                     if (p2.Count != 0)
                                                     {
-                                                        MainClass.WriteLog("Down-line jump: " + p2.Count.ToString());
+                                                        Info.WriteLog("Down-line jump: " + p2.Count.ToString());
                                                         bool @do = false;
                                                         foreach (Platform pl in p2)
                                                         {
@@ -1091,6 +1095,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                             counter = 0;
                                                         }
                                                     }
+                                                    p2.Clear();
                                                 }
                                                 #endregion
 
@@ -1105,7 +1110,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                          select pl).ToList();
                                                     if (p2.Count != 0)
                                                     {
-                                                        MainClass.WriteLog("Inline jump: " + p2.Count.ToString());
+                                                        Info.WriteLog("Inline jump: " + p2.Count.ToString());
                                                         if (dir == Dir.Left && p2[p2.Count - 1].CollisionRect.X > currentPlatform.CollisionRect.X)
                                                         {
                                                             Jump(p2[p2.Count - 1]);
@@ -1128,7 +1133,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                                              select pl).ToList();
                                                         if (p3.Count != 0)
                                                         {
-                                                            MainClass.WriteLog("Up-line jump: " + p3.Count.ToString());
+                                                            Info.WriteLog("Up-line jump: " + p3.Count.ToString());
                                                             foreach (Platform pl in p3)
                                                             {
                                                                 if (dir == Dir.Left)
@@ -1170,7 +1175,9 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                                                             jump = false;
                                                             downWeGo = true;
                                                         }
+                                                        p3.Clear();
                                                     }
+                                                    p2.Clear();
                                                 }
                                                 #endregion
                                             }
@@ -1353,8 +1360,8 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
             currentFrame.Y = 2;
             currentFrame.X = 0;
             state = State.Jump;
-            position.Y = p.CollisionRect.Y - CollisionRect.Height;
-            position.X = p.GetCenter.X - frameSize.X / 2;
+            position.Y = p.CollisionRect.Y - CollisionRect.Height-10;
+            position.X = p.GetCenter.X/* + frameSize.X / 2*/;
             isGrounded = false;
         }
 
@@ -1364,27 +1371,49 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
         /// <param name="r">Collision rectangle of object</param>
         /// <param name="p">Nullable platform. Determines whether enemy stand on platform or on ground</param>
         /// <returns>True, if object intersects with ground or other platform</returns>
-        public bool CollisionCheck(Rectangle r, Platform p = null)
+        public bool CollisionCheck(object o)
         {
-            if (CollisionRect.Intersects(r))
+            if (o is Rectangle r)
             {
-                //Если игрок над платформой, то он останавливается на ней
-                if (CollisionRect.Bottom - r.Top > 0 && CollisionRect.Bottom - r.Top < 10)
+                if (CollisionRect.Intersects(r))
                 {
-                    //gravityOn = false;
-                    isGrounded = true;
-                    if (p == null)
+                    //Если Тень над платформой, то он останавливается на ней
+                    if (CollisionRect.Bottom - r.Top > 5 && CollisionRect.Bottom - r.Top < 15)
                     {
-                        downWeGo = false;
+                        //gravityOn = false;
+                        isGrounded = true;
+                        dir = dir == Dir.Left_Down ? Dir.Left : dir == Dir.Right_Down ? Dir.Right : dir;
+                        currentPlatform = null;
+                        if (state == State.Jump) state = State.Stay;
+                        return true;
                     }
-                    dir = dir == Dir.Left_Down ? Dir.Left : dir == Dir.Right_Down ? Dir.Right : dir;
-                    currentPlatform = p;
-                    if (state == State.Jump) state = State.Stay;
-                    return true;
                 }
+                isGrounded = false;
+                return false;
             }
-            isGrounded = false;
-            return false;
+            else if (o is Platform p)
+            {
+                if (CollisionRect.Intersects(p.CollisionRect))
+                {
+                    //Если Тень над платформой, то он останавливается на ней
+                    if (CollisionRect.Bottom - p.CollisionRect.Top > 5 && CollisionRect.Bottom - p.CollisionRect.Top < 15)
+                    {
+                        //gravityOn = false;
+                        isGrounded = true;
+                        downWeGo = false;
+                        dir = dir == Dir.Left_Down ? Dir.Left : dir == Dir.Right_Down ? Dir.Right : dir;
+                        currentPlatform = p;
+                        if (state == State.Jump) state = State.Stay;
+                        return true;
+                    }
+                }
+                isGrounded = false;
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public override string ToString()
@@ -1400,7 +1429,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
         private void ChooseTarget(List<Lantern> list)
         {
             List<Lantern> l = (from lan in list
-                               where lan != null 
+                               where lan != null
                                && lan.CollisionRect.Intersects(VisionRect)
                                select lan).ToList();
             double distance = visionRadius;
@@ -1414,9 +1443,11 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                     currentTarget = ln;
                 }
             }
+            l.Clear();
         }
         #endregion
 
+        #region Properties
         #region Collision_Rectangles
         /// <summary>
         /// Collision rectangle of enemy
@@ -1472,7 +1503,6 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
         }
         #endregion
 
-#region Properties
         /// <summary>
         /// Returns center of enemy
         /// </summary>
@@ -1483,7 +1513,7 @@ base(spriteSheet, position, frameSize, collisionOffset, currentFrame, sheetSize,
                 return new Point(CollisionRect.X + CollisionRect.Width / 2, CollisionRect.Y + CollisionRect.Height / 2);
             }
         }
-        
+
         /// <summary>
         /// Returns list of all enemies on the level. Except of dead ones
         /// </summary>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DreamCatcher
 {
-    public class Object
+    public class Object : IDisposable
     {
         #region Variables
         InputManager inputManager = new InputManager();
@@ -27,6 +27,9 @@ namespace DreamCatcher
         protected int millisecondsPerFrame;
         protected const int defaultMillisecorndsPerFrame = 16;
         protected Vector2 position;
+
+        protected bool disposed = false;
+        protected object o = new object();
         #endregion
 
         #region Constructors
@@ -39,7 +42,7 @@ namespace DreamCatcher
         public Object(string ID, Texture2D textureImage, Vector2 position, Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize, int millisecondsPerFrame)
         {
             spriteSheet = textureImage;
-            //iconSprite = MainClass.Load<Texture2D>((@"Images\Icons\" + ID).ToString());
+            //iconSprite = Info.Load<Texture2D>((@"Images\Icons\" + ID).ToString());
             this.ID = ID;
             this.position = position;
             this.frameSize = frameSize;
@@ -122,7 +125,6 @@ namespace DreamCatcher
             string s = ID + ";" + position.X + "," + position.Y;
             return s;
         }
-
         //Дичайшая ересь. Я даже не знаю, будет ли работать...
 	//<Подтверждаю. Ересь ещё та. Будет заменено на заготовки Lua>
         public static Object Parse(string info)
@@ -132,8 +134,25 @@ namespace DreamCatcher
             s = reader.ReadLine();
             reader.Dispose();
             reader.Close();
-            Object o = new Object(info.Split(';')[0], MainClass.Load<Texture2D>(s.Split(';')[0]), new Vector2(float.Parse(info.Split(';')[1].Split(',')[0]), float.Parse(info.Split(';')[1].Split(',')[1])), new Point(int.Parse(s.Split(';')[1]), int.Parse(s.Split(';')[2])), int.Parse(s.Split(';')[3]), new Point(int.Parse(s.Split(';')[4]), int.Parse(s.Split(';')[5])), new Point(int.Parse(s.Split(';')[6]), int.Parse(s.Split(';')[7])));
+            Object o = new Object(info.Split(';')[0], Info.Load<Texture2D>(s.Split(';')[0]), new Vector2(float.Parse(info.Split(';')[1].Split(',')[0]), float.Parse(info.Split(';')[1].Split(',')[1])), new Point(int.Parse(s.Split(';')[1]), int.Parse(s.Split(';')[2])), int.Parse(s.Split(';')[3]), new Point(int.Parse(s.Split(';')[4]), int.Parse(s.Split(';')[5])), new Point(int.Parse(s.Split(';')[6]), int.Parse(s.Split(';')[7])));
             return o;
+        }
+
+        public void Dispose()
+        {
+            lock (o)
+            {
+                Dispose(true);
+            }
+        }
+
+        protected virtual void Dispose(bool dispose)
+        {
+            if (dispose)
+            {
+                if(!spriteSheet.IsDisposed) spriteSheet.Dispose();
+                if(!iconSprite.IsDisposed) iconSprite.Dispose();
+            }
         }
         #endregion
 

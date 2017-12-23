@@ -24,27 +24,28 @@ namespace DreamCatcher
         DreamCatcherGame game;
         SpriteBatch spriteBatch;
 
+        private bool isDisposed = false;
+
         #region Level Variables
-            Level level;
+        Level level;
 
             Player player;
-            List<Enemy> enemyList = new List<Enemy>();
+            List<Enemy> enemyList;
 
-            List<Lantern> lanternsList = new List<Lantern>();
-            List<Object> objects = new List<Object>();
+        List<Lantern> lanternsList;
+        List<Object> objects;
 
-            Texture2D[] background = new Texture2D[0];
-            Texture2D ground;
+        List<Texture2D> background;
+        Texture2D ground;
 
-            List<Texture2D> foreground = new List<Texture2D>();
+        List<Texture2D> foreground;
 
-            Rectangle frameSize = new Rectangle(0, 0, 2016, 947); //Вообще это должно задаваться в зависимости от размеров заднего фона... но я не придумал как... пока
-            Rectangle viewFrame = new Rectangle(0, 347, 800, 600); //Рамка, что отрисовывать
-            Rectangle backgroundViewFrame = new Rectangle(0, 110, 800, 600);
-
-            //Фон - 1512 710
-            //Уровень - 2220 800'
-            #endregion
+        Rectangle frameSize; 
+        Rectangle viewFrame; 
+        Rectangle backgroundViewFrame;
+        //Фон - 1512 710
+        //Уровень - 2220 800'
+        #endregion
 
         #endregion
 
@@ -64,6 +65,28 @@ namespace DreamCatcher
         #region Methods
         public override void Initialize()
         {
+            enemyList = new List<Enemy>();
+            lanternsList = new List<Lantern>();
+            objects = new List<Object>();
+            background = new List<Texture2D>();
+            foreground = new List<Texture2D>();
+
+            frameSize = new Rectangle(0, 0, 2016, 947);
+            viewFrame = new Rectangle(0, 347, 800, 600);
+            backgroundViewFrame = new Rectangle(0, 110, 800, 600);
+            //foreach(Texture2D t in background)
+            //{
+            //    t.Dispose();
+            //}
+            //ground.Dispose();
+            //if (foreground.Count != 0)
+            //{
+            //    foreach (Texture2D t in foreground)
+            //    {
+            //        t.Dispose();
+            //    }
+            //    foreground.Clear();
+            //}
             base.Initialize();
         }
 
@@ -71,7 +94,7 @@ namespace DreamCatcher
         {
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
 
-            MainClass.Game.IsLoading = true;
+            Info.Game.IsLoading = true;
             Task t = new Task(LoadLevel);
             t.Start();
         }
@@ -88,10 +111,9 @@ namespace DreamCatcher
                     break;
             }
             NLua.LuaTable tabl = (NLua.LuaTable) table["background"];
-            background = new Texture2D[tabl.Keys.Count];
             for(int i = 0; i<tabl.Values.Count; i++)
             {
-                background[i] = Game.Content.Load<Texture2D>(tabl[i].ToString());
+                background.Add(Game.Content.Load<Texture2D>(tabl[i].ToString()));
             }
             //background[0] = Game.Content.Load<Texture2D>(@"Images\Backgrounds\Background" + Level);
             ground = Game.Content.Load<Texture2D>(table["ground"].ToString());
@@ -137,7 +159,7 @@ namespace DreamCatcher
             level = new Level(game, spriteBatch, player, lantern,
                 new GameScreen(ScreenType.Movable, background, background[0].Bounds.Size, Point.Zero, new Point(1, 1), 0, 0),
                 ground, objects, region, 0);
-            MainClass.Game.IsLoading = false;
+            Info.Game.IsLoading = false;
         }
 
         public override void Update(GameTime gameTime)
@@ -150,6 +172,47 @@ namespace DreamCatcher
         {
             level.Draw(gameTime);
         }
+
+        protected override void UnloadContent()
+        {
+            level.Dispose();
+            level = null;
+
+            if (this.background.Count != 0)
+            {
+                foreach(Texture2D t in background)
+                {
+                    if (t.IsDisposed) continue;
+                    t.Dispose();
+                }
+                background = null;
+            }
+
+            if (this.foreground.Count != 0)
+            {
+                foreach(Texture2D t in foreground)
+                {
+                    if (t.IsDisposed) continue;
+                    t.Dispose();
+                }
+                foreground = null;
+            }
+
+            if (!this.ground.IsDisposed) this.ground.Dispose();
+            this.ground = null;
+
+            if (this.lanternsList.Count != 0)
+            {
+                foreach(Lantern l in lanternsList)
+                {
+                    l.Dispose();
+                }
+                lanternsList = null;
+            }
+            isDisposed = true;
+            base.UnloadContent();
+        }
+
         #endregion
 
         #region Properties
@@ -168,7 +231,7 @@ namespace DreamCatcher
                 if (value >= 0 && value != _Level)
                 {
                     _Level = value;
-                    MainClass.Game.IsLoading = true;
+                    Info.Game.IsLoading = true;
                     Thread loadLevel = new Thread(new ThreadStart(LoadLevel))
                     {
                         IsBackground = true
@@ -177,6 +240,8 @@ namespace DreamCatcher
                 }
             }
         }
+
+        public bool IsDisposed { get => isDisposed; set => isDisposed = value; }
 
         #endregion
     }

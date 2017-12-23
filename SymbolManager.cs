@@ -49,7 +49,7 @@ namespace DreamCatcher
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
             for(int i = 1; i<6; i++)
             {
-                symbolVariants[i - 1] = MainClass.Load<Texture2D>(@"Images\Symbol" + i);
+                symbolVariants[i - 1] = Info.Load<Texture2D>(@"Images\Symbol" + i);
             }
             Symbol s = new Symbol(symbolVariants[rnd.Next(0, 5)], new Vector2(rnd.Next(0, 800 - symbolVariants[0].Bounds.Width), rnd.Next(0, 600 - symbolVariants[0].Bounds.Height)));
             if (s.CollisionRect.Intersects(exclude))
